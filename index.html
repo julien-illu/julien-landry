@@ -96,40 +96,19 @@
     .overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.6rem; font-weight:700; text-shadow:0 3px 10px rgba(0,0,0,0.6); background:rgba(0,0,0,0.45); opacity:0; transition:opacity .3s ease; }
     .preview:hover .overlay { opacity:1; }
 
-    /* --- Commandes / Tarifs --- */
-    .size-options { margin:15px 0; display:flex; flex-wrap:wrap; gap:12px; }
-    .size-options button { display:flex; gap:12px; justify-content:flex-start; }
-    .size-options button.active { background:#a37b2c; }
-    .frame-option label { font-size:16px; display:inline-flex; justify-content:flex-start; align-items:center; gap:8px; }
-.overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.45);
-  opacity: 0;
-  transition: opacity .3s ease;
-}
-
-.overlay span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;   /* pour plusieurs lignes */
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
-  width: 100%;
-  height: 100%;
-  padding: 0 10px;      /* un petit padding pour que le texte respire */
-}
-
-.preview:hover .overlay {
-  opacity: 1;
-}
-
+    .overlay span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+      width: 100%;
+      height: 100%;
+      padding: 0 10px;
+    }
   </style>
 </head>
 <body>
@@ -141,93 +120,31 @@
         <p>Dessin & Peinture – Cours et commandes</p>
       </div>
     </div>
-    <nav>
-      <a href="#cours">Cours</a>
-      <a href="#commandes-tarifs">Commandes & Tarifs</a>
-      <a href="#book">Book</a>
-      <a href="#contact">Contact</a>
-    </nav>
   </header>
 
-<section id="book" class="book">
-  <h2>Mon Book</h2>
-  <p>Voir mes œuvres par catégorie :</p>
-  <div class="book-previews">
-    <div class="preview">
-      <a href="paysages.html" aria-label="Voir Paysages">
-        <img src="images/paysage_preview.jpg" alt="Aperçu Paysages">
-        <div class="overlay"><span>Paysages</span></div>
-      </a>
-    </div>
-    <div class="preview">
-      <a href="portraits.html" aria-label="Voir Portraits">
-        <img src="images/portrait_preview.jpg" alt="Aperçu Portraits">
-        <div class="overlay"><span>Portraits</span></div>
-      </a>
-    </div>
-    <div class="preview">
-      <a href="imagination.html" aria-label="Voir Créations imaginaires">
-        <img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Aperçu Créations imaginaires">
-        <div class="overlay"><span>Créations imaginaires</span></div>
-      </a>
-    </div>
-  </div>
-</section>
-  
-<section id="cours">
-    <h2>Cours de dessin & peinture</h2>
-    <p>Je propose des cours de dessin et de peinture à <strong>17€ / heure</strong>.</p>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-      <input type="hidden" name="cmd" value="_xclick">
-      <input type="hidden" name="business" value="landryjulien47@gmail.com">
-      <input type="hidden" name="item_name" value="Cours de dessin & peinture">
-      <input type="hidden" name="amount" value="17.00">
-      <input type="hidden" name="currency_code" value="EUR">
-      <button type="submit">Acheter un cours (17€)</button>
-    </form>
-  </section>
-
-  <section id="commandes-tarifs">
-    <h2>Commandes personnalisées & Tarifs</h2>
-    <p>Je réalise des dessins sur commande :</p>
-    <ul>
-      <li>Portraits (en personne ou d’après photo)</li>
-      <li>Paysages</li>
-      <li>Natures mortes</li>
-      <li>Autres requêtes selon imagination</li>
-    </ul>
-    <p>Avec ou sans cadre.</p>
-    <p style="margin-bottom:30px;">Envoi rapide et soigné sous papier bulle, ou remise gratuite en main propre à Paris et proche banlieue.</p>
-    
-    <form id="commande-form">
-      <p>Sélectionnez la taille souhaitée pour votre dessin :</p>
-      <div class="size-options">
-        <button type="button" data-name="Petit format – Dessin sur commande" data-price="100" class="active">Petit</button>
-        <button type="button" data-name="Moyen format – Dessin sur commande" data-price="150">Moyen</button>
-        <button type="button" data-name="Grand format – Dessin sur commande" data-price="200">Grand</button>
+  <section id="book" class="book">
+    <h2>Mon Book</h2>
+    <p>Voir mes œuvres par catégorie :</p>
+    <div class="book-previews">
+      <div class="preview">
+        <a href="paysages.html" aria-label="Voir Paysages">
+          <img src="images/paysage_preview.jpg" alt="Aperçu Paysages">
+          <div class="overlay"><span>Paysages</span></div>
+        </a>
       </div>
-
-      <div class="frame-option">
-        <label>
-          <input type="checkbox" id="encadre" data-extra="20">
-          Encadré
-        </label>
+      <div class="preview">
+        <a href="portraits.html" aria-label="Voir Portraits">
+          <img src="images/portrait_preview.jpg" alt="Aperçu Portraits">
+          <div class="overlay"><span>Portraits</span></div>
+        </a>
       </div>
-
-      <p>Prix : <span id="price-display">100€</span></p>
-
-      <label for="request">Votre demande :</label>
-      <textarea name="request" class="auto-expand" placeholder="Décrivez votre illustration..." required></textarea>
-
-      <label for="email">Votre email :</label>
-      <input type="email" name="email" placeholder="Votre email" required>
-
-      <input type="hidden" name="size" value="Petit format – Dessin sur commande">
-      <input type="hidden" name="_subject" value="Nouvelle commande dessin">
-      <input type="hidden" name="_autoresponse" value="Merci pour votre commande, je vous répondrai bientôt.">
-
-      <button type="submit">Envoyer & Payer</button>
-    </form>
+      <div class="preview">
+        <a href="imagination.html" aria-label="Voir Créations imaginaires">
+          <img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Aperçu Créations imaginaires">
+          <div class="overlay"><span>Créations imaginaires</span></div>
+        </a>
+      </div>
+    </div>
   </section>
 
   <section id="contact">
@@ -252,63 +169,6 @@
       const ta = event.target;
       ta.style.height = 'auto';
       ta.style.height = ta.scrollHeight + 'px';
-    });
-
-    const sizeButtons = document.querySelectorAll('.size-options button');
-    const priceDisplay = document.getElementById('price-display');
-    const form = document.getElementById('commande-form');
-    const encadreCheckbox = document.getElementById('encadre');
-
-    function updatePrice() {
-      let activeBtn = document.querySelector('.size-options button.active');
-      let basePrice = parseInt(activeBtn.dataset.price);
-      if(encadreCheckbox.checked){ basePrice += parseInt(encadreCheckbox.dataset.extra); }
-      priceDisplay.textContent = basePrice + '€';
-      form.dataset.price = basePrice;
-    }
-
-    sizeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        sizeButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        form.querySelector('input[name="size"]').value = btn.dataset.name;
-        updatePrice();
-      });
-    });
-    encadreCheckbox.addEventListener('change', updatePrice);
-    updatePrice();
-
-    form.addEventListener('submit', async function(e){
-      e.preventDefault();
-      const requestText = form.querySelector('textarea[name="request"]').value.trim();
-      const emailText = form.querySelector('input[name="email"]').value.trim();
-      const sizeText = form.querySelector('input[name="size"]').value;
-      const priceText = form.dataset.price || "100";
-
-      if(!requestText || !emailText){ alert("Merci de remplir votre email et de décrire votre demande."); return; }
-
-      try {
-        await fetch("https://formspree.io/f/mblaqyvy", {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: emailText,
-            request: requestText,
-            size: sizeText,
-            encadre: encadreCheckbox.checked ? "Oui" : "Non",
-            _subject: "Nouvelle commande dessin"
-          })
-        });
-      } catch(err){ console.error("Erreur Formspree", err); }
-
-      const paypalUrl = new URL("https://www.paypal.com/cgi-bin/webscr");
-      paypalUrl.searchParams.set("cmd","_xclick");
-      paypalUrl.searchParams.set("business","landryjulien47@gmail.com");
-      paypalUrl.searchParams.set("item_name", sizeText + (encadreCheckbox.checked ? " + Encadré" : "") + " — Note client : " + requestText);
-      paypalUrl.searchParams.set("amount", priceText);
-      paypalUrl.searchParams.set("currency_code","EUR");
-      window.open(paypalUrl.toString(), "_blank");
-      location.reload();
     });
   </script>
 </body>
