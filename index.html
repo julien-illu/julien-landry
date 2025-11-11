@@ -1,231 +1,219 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Julien Landry – Dessin & Peinture</title>
-  <style>
-    * { box-sizing: border-box; margin:0; padding:0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="images/caca.png">
+<title>Julien Landry – Dessin & Peinture</title>
+<style>
+/* --- Reset / Base --- */
+* { box-sizing: border-box; margin:0; padding:0; }
 
-    body {
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background-color: #5a5e5f;
-      color: #333;
-      overflow-x: hidden;
-    }
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #5a5e5f;
+  color: #333;
+  overflow-x: hidden;
+}
 
-    @font-face {
-      font-family: 'Riccione Serial XLight';
-      src: url('riccione-serial-xlight.ttf') format('truetype');
-    }
+@font-face {
+  font-family: 'Riccione Serial XLight';
+  src: url('riccione-serial-xlight.ttf') format('truetype');
+}
 
-    header {
-      background-color: #d9d9d9;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 25px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+/* --- Header --- */
+header {
+  background-color: #d9d9d9;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-    header .homeBtn {
-      font-size: 20px;
-      font-weight: 600;
-      cursor: pointer;
-      color: #333;
-      text-decoration: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      transition: color 0.2s, background-color 0.2s;
-    }
+header .homeBtn {
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #333;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  transition: color 0.2s, background-color 0.2s;
+}
+header .homeBtn:hover { color: #666; background-color: rgba(0,0,0,0.05); }
 
-    header .homeBtn:hover {
-      color: #666;
-      background-color: rgba(0,0,0,0.05);
-    }
+header .navLinks { display: flex; gap: 25px; }
+header a.navLink {
+  text-decoration: none;
+  color: #333;
+  font-size: 27px;
+  padding: 10px 5px;
+  letter-spacing: 0.03em;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+header a.navLink:hover { color: #666; background-color: rgba(0,0,0,0.05); }
 
-    header .navLinks {
-      display: flex;
-      gap: 25px;
-    }
+/* --- Main --- */
+main {
+  background-color: #eeeaea;
+  max-width: 1500px;
+  margin: 100px auto 40px auto;
+  padding: 60px;
+  border-radius: 4px;
+  min-height: 400px;
+  position: relative;
+}
 
-    header a.navLink {
-      text-decoration: none;
-      color: #333;
-      font-size: 27px;
-      padding: 10px 5px;
-      letter-spacing: 0.03em;
-      transition: color 0.2s, background-color 0.2s;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
+main h1 {
+  text-align: center;
+  font-size: 5em;
+  margin-bottom: 60px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-family: 'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 
-    header a.navLink:hover {
-      color: #666;
-      background-color: rgba(0,0,0,0.05);
-    }
+/* --- Gallery Masonry --- */
+.gallery {
+  width: 100%;
+  margin-bottom: 40px;
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+}
 
-    main {
-      background-color: #eeeaea;
-      max-width: 1500px;
-      margin: 100px auto 40px auto;
-      padding: 60px;
-      border-radius: 4px;
-      min-height: 400px;
-      transition: all 0.5s ease;
-      position: relative;
-    }
+.masonry-col {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+}
 
-    main h1 {
-      text-align: center;
-      font-size: 5em;
-      margin-bottom: 60px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      font-family: 'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
+.masonry-item {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  background: #f2f2f2;
+}
 
-    /* ---------- Gallery (column approach) ---------- */
-    .gallery {
-      width: 100%;
-      margin-bottom: 40px;
-      display: flex;
-      gap: 25px;
-      align-items: flex-start;
-    }
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  filter: blur(18px);
+  transform: scale(1.03);
+  transition: filter 0.6s ease, transform 0.6s ease, opacity 0.4s ease;
+  opacity: 0.95;
+}
 
-    .masonry-col {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      width: 100%;
-    }
+.masonry-item img.loaded {
+  filter: blur(0);
+  transform: scale(1);
+  opacity: 1;
+}
 
-    .masonry-item {
-      display: block;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      text-decoration: none;
-      background: #f2f2f2;
-    }
+/* --- About & Contact --- */
+#aboutContent, #contactContent {
+  display: none;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #333;
+}
 
-    .masonry-item img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 8px;
-      vertical-align: bottom;
-      filter: blur(18px);
-      transform: scale(1.03);
-      transition: filter 0.6s ease, transform 0.6s ease, opacity 0.4s ease;
-      opacity: 0.95;
-    }
+#aboutContent h2 {
+  font-size: 2em;
+  margin-bottom: 50px;
+  text-align: center;
+  font-weight: 600;
+}
 
-    .masonry-item img.loaded {
-      filter: blur(0);
-      transform: scale(1);
-      opacity: 1;
-    }
+#contactContent form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
 
-    /* ---------- About & Contact ---------- */
-    #aboutContent, #contactContent {
-      display: none;
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: #333;
-    }
+#contactContent input, #contactContent textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  width: 100%;
+}
 
-    /* ✅ Ajout du grand espace entre le titre "À propos" et le texte */
-    #aboutContent h2 {
-      font-size: 2em;
-      margin-bottom: 50px; /* 👈 plus grand espace */
-      text-align: center;
-      font-weight: 600;
-    }
+#contactContent button {
+  padding: 12px;
+  font-size: 1rem;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#contactContent button:hover { background-color: #555; }
 
-    #contactContent form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 20px;
-    }
+/* --- Footer --- */
+main footer {
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #333;
+  font-family: inherit;
+  line-height: 1.7;
+  margin-top: 20px;
+}
 
-    #contactContent input, #contactContent textarea {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-family: inherit;
-      width: 100%;
-    }
+/* --- Lightbox --- */
+.lightbox {
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
 
-    #contactContent button {
-      padding: 12px;
-      font-size: 1rem;
-      background-color: #333;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
+.lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease, opacity 0.25s ease;
+  opacity: 0;
+  transform: scale(0.98);
+}
 
-    #contactContent button:hover {
-      background-color: #555;
-    }
+.lightbox.show img { opacity: 1; transform: scale(1); }
 
-    /* Footer */
-    main footer {
-      text-align: center;
-      font-size: 1.05rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      color: #333;
-      font-family: inherit;
-      line-height: 1.7;
-      margin-top: 20px;
-    }
+/* --- Mobile Layout --- */
+@media (max-width: 700px) {
+  main { padding: 30px; margin: 60px 10px; }
+  main h1 { font-size: 3.2em; margin-bottom: 40px; }
+  header { padding: 14px 18px; }
+  header a.navLink { font-size: 18px; }
 
-    /* Lightbox */
-    .lightbox {
-      position: fixed;
-      top:0; left:0; right:0; bottom:0;
-      background: rgba(0,0,0,0.9);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-
-    .lightbox img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      transition: transform 0.3s ease, opacity 0.25s ease;
-      opacity: 0;
-      transform: scale(0.98);
-    }
-
-    .lightbox.show img {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    @media (max-width: 700px) {
-      main { padding: 30px; margin: 60px 10px; }
-      main h1 { font-size: 3.2em; margin-bottom: 40px; }
-      header { padding: 14px 18px; }
-      header a.navLink { font-size: 18px; }
-    }
-  </style>
+  .gallery { flex-direction: column; gap: 20px; }
+  .masonry-col { width: 100%; }
+  .masonry-item img { border-radius: 4px; }
+}
+</style>
 </head>
 <body>
 
@@ -242,6 +230,7 @@
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
+    <!-- Images source -->
     <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Immagination 1" loading="lazy"></a>
     <a class="masonry-src" href="#"><img src="images/chateau_sans.jpg" alt="Immagination 3" loading="lazy"></a>
     <a class="masonry-src" href="#"><img src="images/layout_afca02.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
@@ -259,20 +248,13 @@
     <p>
       Bonjour !<br><br>
       Je suis peintre, dessinateur, illustrateur et animateur de 20 ans, actuellement en train de terminer mon bachelor en animation à LISAA.<br><br>
-
-      Ce qui me passionne, c’est aussi bien le réel (paysages, natures mortes, modèles vivants) 
-      que le monde de l’imagination.<br><br>
-
-      Je maîtrise plusieurs médiums traditionnels tels que le pastel sec et gras, 
-      l’acrylique, l’aquarelle, la gouache et l’encre… 
-      ainsi que les outils numériques Photoshop et Harmony.<br><br><br><br>
-
-      Email : 
-      <a>landryjulien47@gmail.com</a>
+      Ce qui me passionne, c’est aussi bien le réel (paysages, natures mortes, modèles vivants) que le monde de l’imagination.<br><br>
+      Je maîtrise plusieurs médiums traditionnels tels que le pastel sec et gras, l’acrylique, l’aquarelle, la gouache et l’encre… ainsi que les outils numériques Photoshop et Harmony.<br><br><br><br>
+      Email : <a>landryjulien47@gmail.com</a>
     </p>
   </div>
 
-  <div id="contactContent" style="display:none;">
+  <div id="contactContent">
     <h2>Contact</h2>
     <p>Pour toute question ou commande :</p>
     <form action="https://formspree.io/f/mblaqyvy" method="POST">
@@ -283,9 +265,7 @@
     </form>
   </div>
 
-  <footer>
-    © 2025 Julien Landry – Tous droits réservés
-  </footer>
+  <footer>© 2025 Julien Landry – Tous droits réservés</footer>
 </main>
 
 <div class="lightbox" id="lightbox">
@@ -293,8 +273,7 @@
 </div>
 
 <script>
-/* ========== JS conservé intégralement ========== */
-(function () {
+(function(){
   const galleryEl = document.getElementById('gallery');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = lightbox.querySelector('img');
@@ -304,166 +283,127 @@
   const mainIsland = document.getElementById('mainIsland');
   const aboutContent = document.getElementById('aboutContent');
   const contactContent = document.getElementById('contactContent');
-
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
-  galleryEl.innerHTML = '';
 
-  const placeholderSvg = width => {
-    const w = Math.max(10, Math.round(width || 16));
+  // Masonry layout
+  function placeholderSvg(width) {
+    const w = Math.max(10, Math.round(width||16));
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-  };
-
-  function getColCount(containerWidth) {
-    if (containerWidth < 650) return 1;
-    if (containerWidth < 1000) return 2;
-    return 3;
   }
 
-  let currentCols = [];
-  function buildColumns() {
-    galleryEl.innerHTML = '';
-    currentCols = [];
+  function getColCount(containerWidth){
+    return (containerWidth <= 700) ? 1 : 3; // mobile:1, pc:3
+  }
 
-    const containerWidth = galleryEl.clientWidth || galleryEl.getBoundingClientRect().width || document.documentElement.clientWidth;
+  let currentCols=[];
+  function buildColumns(){
+    galleryEl.innerHTML='';
+    currentCols=[];
+    const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
     const cols = getColCount(containerWidth);
-    for (let i = 0; i < cols; i++) {
-      const col = document.createElement('div');
-      col.className = 'masonry-col';
+    for(let i=0;i<cols;i++){
+      const col=document.createElement('div');
+      col.className='masonry-col';
       galleryEl.appendChild(col);
       currentCols.push(col);
     }
-
-    sourceAnchors.forEach(srcAnchor => {
-      const newA = document.createElement('a');
-      newA.className = 'masonry-item';
-      newA.href = srcAnchor.getAttribute('href') || '#';
-      const origImg = srcAnchor.querySelector('img');
-      const img = origImg.cloneNode(true);
-      const originalSrc = img.getAttribute('src') || '';
+    sourceAnchors.forEach(srcAnchor=>{
+      const newA=document.createElement('a');
+      newA.className='masonry-item';
+      newA.href=srcAnchor.getAttribute('href')||'#';
+      const img=srcAnchor.querySelector('img').cloneNode(true);
+      const originalSrc=img.getAttribute('src')||'';
       img.setAttribute('data-src', originalSrc);
-      img.src = placeholderSvg(16);
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      img.classList.add('masonry-img');
+      img.src=placeholderSvg(16);
+      img.loading='lazy';
+      img.decoding='async';
       newA.appendChild(img);
 
-      let targetCol = currentCols[0];
-      let minHeight = targetCol.offsetHeight;
-      for (let c = 1; c < currentCols.length; c++) {
-        if (currentCols[c].offsetHeight < minHeight) {
-          targetCol = currentCols[c];
-          minHeight = currentCols[c].offsetHeight;
+      let targetCol=currentCols[0];
+      let minHeight=targetCol.offsetHeight;
+      for(let c=1;c<currentCols.length;c++){
+        if(currentCols[c].offsetHeight<minHeight){
+          targetCol=currentCols[c];
+          minHeight=currentCols[c].offsetHeight;
         }
       }
       targetCol.appendChild(newA);
     });
   }
 
-  let io = null;
-  function setupLazyObserver() {
-    if (io) io.disconnect();
-    const options = { root: null, rootMargin: '250px 0px', threshold: 0.01 };
-    io = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const img = entry.target;
-        const full = img.getAttribute('data-src');
-        if (full) {
-          img.src = full;
-          img.onload = () => {
-            img.classList.add('loaded');
-            img.removeAttribute('data-src');
-          };
-          img.onerror = () => img.removeAttribute('data-src');
+  // Lazy loading
+  let io=null;
+  function setupLazyObserver(){
+    if(io) io.disconnect();
+    io=new IntersectionObserver((entries,obs)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        const img=entry.target;
+        const full=img.getAttribute('data-src');
+        if(full){
+          img.src=full;
+          img.onload=()=>{img.classList.add('loaded'); img.removeAttribute('data-src');};
+          img.onerror=()=>img.removeAttribute('data-src');
         }
         obs.unobserve(img);
       });
-    }, options);
-
-    const imgs = galleryEl.querySelectorAll('img[data-src]');
-    imgs.forEach(img => io.observe(img));
+    }, {root:null, rootMargin:'250px 0px', threshold:0.01});
+    galleryEl.querySelectorAll('img[data-src]').forEach(img=>io.observe(img));
   }
 
-  function setupLightbox() {
-    galleryEl.addEventListener('click', (e) => {
-      const a = e.target.closest('a.masonry-item');
-      if (!a) return;
+  // Lightbox
+  function setupLightbox(){
+    galleryEl.addEventListener('click', e=>{
+      const a=e.target.closest('a.masonry-item');
+      if(!a) return;
       e.preventDefault();
-      const img = a.querySelector('img');
-      const src = img.src && !img.hasAttribute('data-src') ? img.src : img.getAttribute('data-src') || img.src;
-      lightboxImg.src = src;
-      lightbox.style.display = 'flex';
-      requestAnimationFrame(() => lightbox.classList.add('show'));
+      const img=a.querySelector('img');
+      const src=img.src && !img.hasAttribute('data-src') ? img.src : img.getAttribute('data-src')||img.src;
+      lightboxImg.src=src;
+      lightbox.style.display='flex';
+      requestAnimationFrame(()=>lightbox.classList.add('show'));
     });
-
-    lightbox.addEventListener('click', () => {
+    lightbox.addEventListener('click', ()=>{
       lightbox.classList.remove('show');
-      setTimeout(() => {
-        lightbox.style.display = 'none';
-        lightboxImg.src = '';
-      }, 250);
+      setTimeout(()=>{lightbox.style.display='none'; lightboxImg.src='';},250);
     });
-
-    window.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape' && lightbox.classList.contains('show')) {
+    window.addEventListener('keydown', ev=>{
+      if(ev.key==='Escape' && lightbox.classList.contains('show')){
         lightbox.classList.remove('show');
-        setTimeout(() => {
-          lightbox.style.display = 'none';
-          lightboxImg.src = '';
-        }, 250);
+        setTimeout(()=>{lightbox.style.display='none'; lightboxImg.src='';},250);
       }
     });
   }
 
-  function showSection(section) {
-    galleryEl.style.display = 'none';
-    aboutContent.style.display = 'none';
-    contactContent.style.display = 'none';
-    section.style.display = 'block';
-    mainIsland.scrollIntoView({ behavior: 'smooth' });
+  // Sections navigation
+  function showSection(section){
+    galleryEl.style.display='none';
+    aboutContent.style.display='none';
+    contactContent.style.display='none';
+    section.style.display='block';
+    mainIsland.scrollIntoView({behavior:'smooth'});
   }
 
-  aboutBtn.addEventListener('click', () => showSection(aboutContent));
-  contactBtn.addEventListener('click', () => showSection(contactContent));
-  homeBtn.addEventListener('click', () => {
-    aboutContent.style.display = 'none';
-    contactContent.style.display = 'none';
-    galleryEl.style.display = 'flex';
+  aboutBtn.addEventListener('click', ()=>showSection(aboutContent));
+  contactBtn.addEventListener('click', ()=>showSection(contactContent));
+  homeBtn.addEventListener('click', ()=>{
+    aboutContent.style.display='none';
+    contactContent.style.display='none';
+    galleryEl.style.display='flex';
     buildColumns();
     setupLazyObserver();
-    mainIsland.scrollIntoView({ behavior: 'smooth' });
+    mainIsland.scrollIntoView({behavior:'smooth'});
   });
 
-  function debounce(fn, wait = 120) {
-    let t = null;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), wait);
-    };
-  }
+  // Resize debounce
+  function debounce(fn,wait=150){ let t=null; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
+  window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); },150));
 
-  const handleResize = debounce(() => {
-    buildColumns();
-    setupLazyObserver();
-  }, 150);
-
-  function init() {
-    buildColumns();
-    setupLazyObserver();
-    setupLightbox();
-    window.addEventListener('resize', handleResize);
-    setTimeout(() => {
-      const imgs = galleryEl.querySelectorAll('img');
-      imgs.forEach(img => {
-        if (!img.hasAttribute('data-src') && img.complete) {
-          img.classList.add('loaded');
-        }
-      });
-    }, 600);
-  }
-
-  init();
+  // Init
+  buildColumns();
+  setupLazyObserver();
+  setupLightbox();
 })();
 </script>
 
