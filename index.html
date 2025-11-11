@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Julien Landry – Dessin & Peinture</title>
   <style>
     * { box-sizing: border-box; margin:0; padding:0; }
@@ -89,34 +90,63 @@
       font-family: 'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
-    /* Gallery */
+    /* ---------- Gallery (column approach) ---------- */
     .gallery {
-      position: relative;
       width: 100%;
       margin-bottom: 40px;
+      display: flex;
+      gap: 25px;
+      align-items: flex-start;
     }
 
-    .gallery a {
-      position: absolute;
-      display: block;
-      margin-bottom: 25px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .gallery img {
+    .masonry-col {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
       width: 100%;
+    }
+
+    .masonry-item {
+      display: block;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      background: #f2f2f2;
+    }
+
+    .masonry-item img {
+      width: 100%;
+      height: auto;
       display: block;
       border-radius: 8px;
       vertical-align: bottom;
+      filter: blur(18px);
+      transform: scale(1.03);
+      transition: filter 0.6s ease, transform 0.6s ease, opacity 0.4s ease;
+      opacity: 0.95;
     }
 
-    /* About & Contact content */
+    .masonry-item img.loaded {
+      filter: blur(0);
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    /* ---------- About & Contact ---------- */
     #aboutContent, #contactContent {
       display: none;
       font-size: 1.1rem;
       line-height: 1.7;
       color: #333;
+    }
+
+    /* ✅ Ajout du grand espace entre le titre "À propos" et le texte */
+    #aboutContent h2 {
+      font-size: 2em;
+      margin-bottom: 50px; /* 👈 plus grand espace */
+      text-align: center;
+      font-weight: 600;
     }
 
     #contactContent form {
@@ -171,6 +201,7 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      padding: 20px;
     }
 
     .lightbox img {
@@ -178,7 +209,21 @@
       max-height: 90%;
       border-radius: 8px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.25s ease;
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    .lightbox.show img {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    @media (max-width: 700px) {
+      main { padding: 30px; margin: 60px 10px; }
+      main h1 { font-size: 3.2em; margin-bottom: 40px; }
+      header { padding: 14px 18px; }
+      header a.navLink { font-size: 18px; }
     }
   </style>
 </head>
@@ -195,25 +240,40 @@
 
 <main id="mainIsland">
   <h1>Julien Landry</h1>
+
   <div class="gallery" id="gallery">
-    <a href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Immagination 1" loading="lazy"></a>
-    <a href="#"><img src="images/chateau_sans.jpg" alt="Immagination 3" loading="lazy"></a>
-    <a href="#"><img src="images/layout_afca02.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
-    <a href="#"><img src="images/picnic.png" alt="Picnicmonstre" loading="lazy"></a>
-    <a href="#"><img src="images/Portrait_preview.jpg" alt="Portrait 2" loading="lazy"></a>
-    <a href="#"><img src="images/carnet01.jpg" alt="Portrait 1" loading="lazy"></a>
-    <a href="#"><img src="images/paysage_preview.jpg" alt="Paysage 1" loading="lazy"></a>
-    <a href="#"><img src="images/medicis.jpg" alt="Paysage 2" loading="lazy"></a>
-    <a href="#"><img src="images/donkey_sketchbook3.jpg" alt="Paysage 3" loading="lazy"></a>
-    <a href="#"><img src="images/ettalong_crayon_pastel.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Immagination 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/chateau_sans.jpg" alt="Immagination 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/layout_afca02.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/picnic.png" alt="Picnicmonstre" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/Portrait_preview.jpg" alt="Portrait 2" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/carnet01.jpg" alt="Portrait 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/paysage_preview.jpg" alt="Paysage 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/medicis.jpg" alt="Paysage 2" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.jpg" alt="Paysage 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
   </div>
 
   <div id="aboutContent">
     <h2>À propos</h2>
-    <p>   </p>
+    <p>
+      Bonjour !<br><br>
+      Je suis peintre, dessinateur, illustrateur et animateur de 20 ans, actuellement en train de terminer mon bachelor en animation à LISAA.<br><br>
+
+      Ce qui me passionne, c’est aussi bien le réel (paysages, natures mortes, modèles vivants) 
+      que le monde de l’imagination.<br><br>
+
+      Je maîtrise plusieurs médiums traditionnels tels que le pastel sec et gras, 
+      l’acrylique, l’aquarelle, la gouache et l’encre… 
+      ainsi que les outils numériques Photoshop et Harmony.<br><br><br><br>
+
+
+      Email : 
+      <a>landryjulien47@gmail.com</a>
+    </p>
   </div>
 
-  <div id="contactContent">
+  <div id="contactContent" style="display:none;">
     <h2>Contact</h2>
     <p>Pour toute question ou commande :</p>
     <form action="https://formspree.io/f/mblaqyvy" method="POST">
@@ -234,84 +294,178 @@
 </div>
 
 <script>
-// Masonry Gallery
-const gallery = document.getElementById('gallery');
-const items = gallery.querySelectorAll('a');
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = lightbox.querySelector('img');
+/* ========== JS conservé intégralement ========== */
+(function () {
+  const galleryEl = document.getElementById('gallery');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = lightbox.querySelector('img');
+  const aboutBtn = document.getElementById('aboutBtn');
+  const contactBtn = document.getElementById('contactBtn');
+  const homeBtn = document.getElementById('homeBtn');
+  const mainIsland = document.getElementById('mainIsland');
+  const aboutContent = document.getElementById('aboutContent');
+  const contactContent = document.getElementById('contactContent');
 
-function masonryLayout() {
-  const containerWidth = gallery.clientWidth;
-  const gap = 25;
-  let colCount = 3;
-  if(containerWidth < 1000) colCount = 2;
-  if(containerWidth < 650) colCount = 1;
-  const colWidth = (containerWidth - (colCount - 1) * gap) / colCount;
-  const colHeights = Array(colCount).fill(0);
+  const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
+  galleryEl.innerHTML = '';
 
-  items.forEach(item => {
-    const img = item.querySelector('img');
-    const minCol = colHeights.indexOf(Math.min(...colHeights));
-    const x = minCol * (colWidth + gap);
-    const y = colHeights[minCol];
-    item.style.transform = `translate(${x}px, ${y}px)`;
-    item.style.width = colWidth + 'px';
-    colHeights[minCol] += img.offsetHeight + gap;
+  const placeholderSvg = width => {
+    const w = Math.max(10, Math.round(width || 16));
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  };
+
+  function getColCount(containerWidth) {
+    if (containerWidth < 650) return 1;
+    if (containerWidth < 1000) return 2;
+    return 3;
+  }
+
+  let currentCols = [];
+  function buildColumns() {
+    galleryEl.innerHTML = '';
+    currentCols = [];
+
+    const containerWidth = galleryEl.clientWidth || galleryEl.getBoundingClientRect().width || document.documentElement.clientWidth;
+    const cols = getColCount(containerWidth);
+    for (let i = 0; i < cols; i++) {
+      const col = document.createElement('div');
+      col.className = 'masonry-col';
+      galleryEl.appendChild(col);
+      currentCols.push(col);
+    }
+
+    sourceAnchors.forEach(srcAnchor => {
+      const newA = document.createElement('a');
+      newA.className = 'masonry-item';
+      newA.href = srcAnchor.getAttribute('href') || '#';
+      const origImg = srcAnchor.querySelector('img');
+      const img = origImg.cloneNode(true);
+      const originalSrc = img.getAttribute('src') || '';
+      img.setAttribute('data-src', originalSrc);
+      img.src = placeholderSvg(16);
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.classList.add('masonry-img');
+      newA.appendChild(img);
+
+      let targetCol = currentCols[0];
+      let minHeight = targetCol.offsetHeight;
+      for (let c = 1; c < currentCols.length; c++) {
+        if (currentCols[c].offsetHeight < minHeight) {
+          targetCol = currentCols[c];
+          minHeight = currentCols[c].offsetHeight;
+        }
+      }
+      targetCol.appendChild(newA);
+    });
+  }
+
+  let io = null;
+  function setupLazyObserver() {
+    if (io) io.disconnect();
+    const options = { root: null, rootMargin: '250px 0px', threshold: 0.01 };
+    io = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const img = entry.target;
+        const full = img.getAttribute('data-src');
+        if (full) {
+          img.src = full;
+          img.onload = () => {
+            img.classList.add('loaded');
+            img.removeAttribute('data-src');
+          };
+          img.onerror = () => img.removeAttribute('data-src');
+        }
+        obs.unobserve(img);
+      });
+    }, options);
+
+    const imgs = galleryEl.querySelectorAll('img[data-src]');
+    imgs.forEach(img => io.observe(img));
+  }
+
+  function setupLightbox() {
+    galleryEl.addEventListener('click', (e) => {
+      const a = e.target.closest('a.masonry-item');
+      if (!a) return;
+      e.preventDefault();
+      const img = a.querySelector('img');
+      const src = img.src && !img.hasAttribute('data-src') ? img.src : img.getAttribute('data-src') || img.src;
+      lightboxImg.src = src;
+      lightbox.style.display = 'flex';
+      requestAnimationFrame(() => lightbox.classList.add('show'));
+    });
+
+    lightbox.addEventListener('click', () => {
+      lightbox.classList.remove('show');
+      setTimeout(() => {
+        lightbox.style.display = 'none';
+        lightboxImg.src = '';
+      }, 250);
+    });
+
+    window.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && lightbox.classList.contains('show')) {
+        lightbox.classList.remove('show');
+        setTimeout(() => {
+          lightbox.style.display = 'none';
+          lightboxImg.src = '';
+        }, 250);
+      }
+    });
+  }
+
+  function showSection(section) {
+    galleryEl.style.display = 'none';
+    aboutContent.style.display = 'none';
+    contactContent.style.display = 'none';
+    section.style.display = 'block';
+    mainIsland.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  aboutBtn.addEventListener('click', () => showSection(aboutContent));
+  contactBtn.addEventListener('click', () => showSection(contactContent));
+  homeBtn.addEventListener('click', () => {
+    aboutContent.style.display = 'none';
+    contactContent.style.display = 'none';
+    galleryEl.style.display = 'flex';
+    buildColumns();
+    setupLazyObserver();
+    mainIsland.scrollIntoView({ behavior: 'smooth' });
   });
 
-  gallery.style.height = Math.max(...colHeights) + 'px';
-}
+  function debounce(fn, wait = 120) {
+    let t = null;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  }
 
-items.forEach(item => {
-  const img = item.querySelector('img');
-  if(img.complete) masonryLayout();
-  else img.addEventListener('load', masonryLayout);
-});
+  const handleResize = debounce(() => {
+    buildColumns();
+    setupLazyObserver();
+  }, 150);
 
-window.addEventListener('load', masonryLayout);
-window.addEventListener('resize', masonryLayout);
+  function init() {
+    buildColumns();
+    setupLazyObserver();
+    setupLightbox();
+    window.addEventListener('resize', handleResize);
+    setTimeout(() => {
+      const imgs = galleryEl.querySelectorAll('img');
+      imgs.forEach(img => {
+        if (!img.hasAttribute('data-src') && img.complete) {
+          img.classList.add('loaded');
+        }
+      });
+    }, 600);
+  }
 
-// Lightbox
-items.forEach(item => {
-  const img = item.querySelector('img');
-  item.addEventListener('click', e => {
-    e.preventDefault();
-    lightboxImg.src = img.src;
-    lightbox.style.display = 'flex';
-  });
-});
-
-lightbox.addEventListener('click', () => {
-  lightbox.style.display = 'none';
-  lightboxImg.src = '';
-});
-
-// About & Contact functionality
-const aboutBtn = document.getElementById('aboutBtn');
-const contactBtn = document.getElementById('contactBtn');
-const homeBtn = document.getElementById('homeBtn');
-const mainIsland = document.getElementById('mainIsland');
-const galleryDiv = document.getElementById('gallery');
-const aboutContent = document.getElementById('aboutContent');
-const contactContent = document.getElementById('contactContent');
-
-function showSection(section) {
-  galleryDiv.style.display = 'none';
-  aboutContent.style.display = 'none';
-  contactContent.style.display = 'none';
-
-  section.style.display = 'block';
-  mainIsland.scrollIntoView({ behavior: 'smooth' });
-}
-
-aboutBtn.addEventListener('click', () => showSection(aboutContent));
-contactBtn.addEventListener('click', () => showSection(contactContent));
-homeBtn.addEventListener('click', () => {
-  aboutContent.style.display = 'none';
-  contactContent.style.display = 'none';
-  galleryDiv.style.display = 'block';
-  mainIsland.scrollIntoView({ behavior: 'smooth' });
-});
+  init();
+})();
 </script>
 
 </body>
