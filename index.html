@@ -8,46 +8,213 @@
 <style>
 /* --- Reset / Base --- */
 * { box-sizing: border-box; margin:0; padding:0; }
-body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; background:#5a5e5f; color:#333; overflow-x:hidden; }
-@font-face { font-family: 'Riccione Serial XLight'; src: url('riccione-serial-xlight.ttf') format('truetype'); }
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #5a5e5f;
+  color: #333;
+  overflow-x: hidden;
+}
+
+@font-face {
+  font-family: 'Riccione Serial XLight';
+  src: url('riccione-serial-xlight.ttf') format('truetype');
+}
 
 /* --- Header --- */
-header { background:#d9d9d9; padding:20px 40px; display:flex; justify-content:space-between; align-items:center; gap:25px; position:sticky; top:0; z-index:10; }
-header .homeBtn { font-size:20px; font-weight:600; cursor:pointer; color:#333; text-decoration:none; padding:10px 15px; border-radius:4px; transition:0.2s; }
-header .homeBtn:hover { color:#666; background:rgba(0,0,0,0.05); }
-header .navLinks { display:flex; gap:25px; }
-header a.navLink { text-decoration:none; color:#333; font-size:27px; padding:10px 5px; letter-spacing:0.03em; transition:0.2s; border-radius:4px; display:flex; align-items:center; cursor:pointer; }
-header a.navLink:hover { color:#666; background:rgba(0,0,0,0.05); }
+header {
+  background-color: #d9d9d9;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header .homeBtn {
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #333;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  transition: color 0.2s, background-color 0.2s;
+}
+header .homeBtn:hover { color: #666; background-color: rgba(0,0,0,0.05); }
+
+header .navLinks { display: flex; gap: 25px; }
+header a.navLink {
+  text-decoration: none;
+  color: #333;
+  font-size: 27px;
+  padding: 10px 5px;
+  letter-spacing: 0.03em;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+header a.navLink:hover { color: #666; background-color: rgba(0,0,0,0.05); }
 
 /* --- Main --- */
-main { background:#eeeaea; max-width:1500px; margin:100px auto 40px auto; padding:60px; border-radius:4px; min-height:400px; position:relative; }
-main h1 { text-align:center; font-size:5em; margin-bottom:60px; font-weight:500; letter-spacing:0.08em; font-family:'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif; }
+main {
+  background-color: #eeeaea;
+  max-width: 1500px;
+  margin: 100px auto 40px auto;
+  padding: 60px;
+  border-radius: 4px;
+  min-height: 400px;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+main h1 {
+  text-align: center;
+  font-size: 5em;
+  margin-bottom: 60px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-family: 'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 
 /* --- Gallery Masonry --- */
-.gallery { width:100%; margin-bottom:40px; display:flex; gap:25px; align-items:flex-start; }
-.masonry-col { display:flex; flex-direction:column; gap:25px; width:100%; }
-.masonry-item { display:block; border-radius:8px; overflow:hidden; cursor:pointer; text-decoration:none; background:#f2f2f2; }
-.masonry-item img { width:100%; height:auto; display:block; border-radius:8px; filter:blur(18px); transform:scale(1.03); transition:filter 0.6s ease, transform 0.6s ease, opacity 0.4s ease; opacity:0.95; }
-.masonry-item img.loaded { filter:blur(0); transform:scale(1); opacity:1; }
+.gallery {
+  width: 100%;
+  margin-bottom: 40px;
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+}
+
+.masonry-col {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+}
+
+.masonry-item {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  background: #f2f2f2;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  /* léger blur pour effet "progressif" (plus petit que précédemment) */
+  filter: blur(6px);
+  transform: scale(1.02);
+  transition: filter 0.45s ease, transform 0.45s ease, opacity 0.3s ease;
+  opacity: 0.95;
+}
+
+.masonry-item img.loaded {
+  filter: blur(0);
+  transform: scale(1);
+  opacity: 1;
+}
 
 /* --- About & Contact --- */
-#aboutContent, #contactContent { display:none; font-size:1.1rem; line-height:1.7; color:#333; }
-#aboutContent h2, #contactContent h2 { font-size:2em; margin-bottom:50px; text-align:center; font-weight:600; }
-#contactContent form { display:flex; flex-direction:column; gap:15px; margin-top:20px; }
-#contactContent input, #contactContent textarea { padding:10px; border:1px solid #ccc; border-radius:4px; font-size:1rem; font-family:inherit; width:100%; }
-#contactContent button { padding:12px; font-size:1rem; background:#333; color:#fff; border:none; border-radius:4px; cursor:pointer; transition:0.2s; }
-#contactContent button:hover { background:#555; }
+#aboutContent, #contactContent {
+  display: none;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+#aboutContent h2 {
+  font-size: 2em;
+  margin-bottom: 50px;
+  text-align: center;
+  font-weight: 600;
+}
+
+#contactContent form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+#contactContent input, #contactContent textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+#contactContent button {
+  padding: 12px;
+  font-size: 1rem;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#contactContent button:hover { background-color: #555; }
 
 /* --- Footer --- */
-main footer { text-align:center; font-size:1.05rem; font-weight:500; letter-spacing:0.05em; color:#333; font-family:inherit; line-height:1.7; margin-top:20px; }
+main footer {
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #333;
+  font-family: inherit;
+  line-height: 1.7;
+  margin-top: 20px;
+}
 
 /* --- Lightbox --- */
-.lightbox { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-.lightbox img { max-width:90%; max-height:90%; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.5); transition:transform 0.3s ease, opacity 0.25s ease; opacity:0; transform:scale(0.98); }
-.lightbox.show img { opacity:1; transform:scale(1); }
+.lightbox {
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease, opacity 0.25s ease;
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.lightbox.show img { opacity: 1; transform: scale(1); }
 
 /* --- Mobile Layout --- */
-@media (max-width:700px) { main { padding:30px; margin:60px 10px; } main h1 { font-size:3.2em; margin-bottom:40px; } header { padding:14px 18px; } header a.navLink { font-size:18px; } .gallery { flex-direction:column; gap:20px; } .masonry-col { width:100%; } .masonry-item img { border-radius:4px; } }
+@media (max-width: 700px) {
+  main { padding: 30px; margin: 60px 10px; }
+  main h1 { font-size: 3.2em; margin-bottom: 40px; }
+  header { padding: 14px 18px; }
+  header a.navLink { font-size: 18px; }
+
+  .gallery { flex-direction: column; gap: 20px; }
+  .masonry-col { width: 100%; }
+  .masonry-item img { border-radius: 4px; }
+}
 </style>
 </head>
 <body>
@@ -65,21 +232,27 @@ main footer { text-align:center; font-size:1.05rem; font-weight:500; letter-spac
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Immagination 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/chateau_sans.jpg" alt="Immagination 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/layout_afca02.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/picnic.png" alt="Picnicmonstre" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/portrait_preview.png" alt="Portrait 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/carnet01.jpg" alt="Portrait 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/paysage_preview.jpg" alt="Paysage 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/medicis.jpg" alt="Paysage 2" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.jpg" alt="Paysage 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/chateau_sans.webp" alt="Immagination 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/layout_afca02.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/picnic.webp" alt="Picnicmonstre" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/portrait_preview.webp" alt="Portrait 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/carnet01.webp" alt="Portrait 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/paysage_preview.webp" alt="Paysage 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/medicis.webp" alt="Paysage 2" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.webp" alt="Paysage 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
   </div>
 
   <div id="aboutContent">
     <h2>À propos</h2>
-    <p>Bonjour !<br><br>Je suis peintre, dessinateur, illustrateur et animateur de 20 ans, actuellement en train de terminer mon bachelor en animation à LISAA.<br><br>Ce qui me passionne, c’est aussi bien le réel (paysages, natures mortes, modèles vivants) que le monde de l’imagination.<br><br>Je maîtrise plusieurs médiums traditionnels tels que le pastel sec et gras, l’acrylique, l’aquarelle, la gouache et l’encre… ainsi que les outils numériques Photoshop et Harmony.<br><br><br><br>Email : <a>landryjulien47@gmail.com</a></p>
+    <p>
+      Bonjour !<br><br>
+      Je suis peintre, dessinateur, illustrateur et animateur de 20 ans, actuellement en train de terminer mon bachelor en animation à LISAA.<br><br>
+      Ce qui me passionne, c’est aussi bien le réel (paysages, natures mortes, modèles vivants) que le monde de l’imagination.<br><br>
+      Je maîtrise plusieurs médiums traditionnels tels que le pastel sec et gras, l’acrylique, l’aquarelle, la gouache et l’encre… ainsi que les outils numériques Photoshop et Harmony.<br><br><br><br>
+      Email : <a>landryjulien47@gmail.com</a>
+    </p>
   </div>
 
   <div id="contactContent">
@@ -96,7 +269,9 @@ main footer { text-align:center; font-size:1.05rem; font-weight:500; letter-spac
   <footer>© 2025 Julien Landry – Tous droits réservés</footer>
 </main>
 
-<div class="lightbox" id="lightbox"><img src="" alt="Agrandissement"></div>
+<div class="lightbox" id="lightbox">
+  <img src="" alt="Agrandissement">
+</div>
 
 <script>
 (function(){
@@ -109,110 +284,214 @@ main footer { text-align:center; font-size:1.05rem; font-weight:500; letter-spac
   const mainIsland = document.getElementById('mainIsland');
   const aboutContent = document.getElementById('aboutContent');
   const contactContent = document.getElementById('contactContent');
+
+  // On récupère les anchors originales (elles existent puisque le script est à la fin du body)
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
 
-  let masonryBuilt = false;
-
+  /* --- Masonry layout --- */
   function placeholderSvg(width){
     const w = Math.max(10, Math.round(width||16));
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
 
-  function getColCount(containerWidth){ return (containerWidth <=700)?1:3; }
-
-  let cols = [];
-  function buildMasonry(){
-    if(masonryBuilt) return; // only build once
-    galleryEl.innerHTML='';
-    cols=[];
-    const colCount = getColCount(galleryEl.clientWidth);
-    for(let i=0;i<colCount;i++){
-      const col = document.createElement('div');
-      col.className='masonry-col';
-      galleryEl.appendChild(col);
-      cols.push(col);
-    }
-
-    sourceAnchors.forEach(a=>{
-      const item = document.createElement('a');
-      item.className='masonry-item';
-      item.href = a.href || '#';
-      const img = a.querySelector('img').cloneNode(true);
-      const src = img.getAttribute('src');
-      img.setAttribute('data-src', src);
-      img.src = placeholderSvg(16);
-      img.loading='lazy';
-      img.decoding='async';
-      item.appendChild(img);
-
-      // append to shortest column
-      let target = cols[0];
-      for(const c of cols){
-        if(c.offsetHeight<target.offsetHeight) target=c;
-      }
-      target.appendChild(item);
-    });
-    masonryBuilt = true;
+  function getColCount(containerWidth){
+    return (containerWidth <= 700) ? 1 : 3;
   }
 
-  // --- Lazy loading ---
-  const io = new IntersectionObserver((entries, obs)=>{
-    entries.forEach(entry=>{
-      if(!entry.isIntersecting) return;
-      const img = entry.target;
-      const src = img.getAttribute('data-src');
-      if(src){
-        img.src = src;
-        img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src'); };
-        img.onerror = ()=>img.removeAttribute('data-src');
+  let currentCols=[];
+  function buildColumns(){
+    // clear existing gallery DOM (only the columns) but keep sourceAnchors array intact
+    galleryEl.innerHTML='';
+    currentCols=[];
+    const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
+    const cols = getColCount(containerWidth);
+    for(let i=0;i<cols;i++){
+      const col=document.createElement('div');
+      col.className='masonry-col';
+      galleryEl.appendChild(col);
+      currentCols.push(col);
+    }
+
+    // place items evenly (lowest column height first)
+    sourceAnchors.forEach(srcAnchor=>{
+      const newA=document.createElement('a');
+      newA.className='masonry-item';
+      // keep original href (if empty, '#')
+      newA.href = srcAnchor.getAttribute('href') || '#';
+
+      // clone image but do NOT keep its src (we will use placeholder + data-src mechanism)
+      const originalImg = srcAnchor.querySelector('img');
+      const img = originalImg.cloneNode(false); // shallow clone (no src)
+      const originalSrc = originalImg.getAttribute('src') || '';
+      // Prefer .webp variant if server provides it (we attempt; fallback to original)
+      let webpCandidate = '';
+      if(originalSrc){
+        // replace extension by .webp (best-effort)
+        webpCandidate = originalSrc.replace(/\.\w+$/,'') + '.webp';
       }
-      obs.unobserve(img);
+
+      // store potential sources
+      img.setAttribute('data-src-fallback', originalSrc);
+      // store candidate webp - we'll try it first; onerror we fallback
+      if(webpCandidate) img.setAttribute('data-src', webpCandidate);
+      else img.setAttribute('data-src', originalSrc);
+
+      // set tiny placeholder so layout is fast and nothing is huge
+      img.src = placeholderSvg(16);
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      newA.appendChild(img);
+
+      // append to the shortest column
+      let targetCol = currentCols[0];
+      let minHeight = targetCol.offsetHeight;
+      for(let c=1;c<currentCols.length;c++){
+        if(currentCols[c].offsetHeight < minHeight){
+          targetCol = currentCols[c];
+          minHeight = currentCols[c].offsetHeight;
+        }
+      }
+      targetCol.appendChild(newA);
     });
-  }, { root:null, rootMargin:'250px 0px', threshold:0.01 });
+  }
 
-  function observeImages(){ galleryEl.querySelectorAll('img[data-src]').forEach(img=>io.observe(img)); }
+  /* --- Lazy loading --- */
+  let io = null;
+  function setupLazyObserver(){
+    if(io) io.disconnect();
+    io = new IntersectionObserver((entries, obs)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        const img = entry.target;
+        const candidate = img.getAttribute('data-src');
+        const fallback = img.getAttribute('data-src-fallback');
+        if(!candidate && !fallback){
+          obs.unobserve(img);
+          return;
+        }
 
-  // --- Lightbox ---
-  galleryEl.addEventListener('click', e=>{
-    const a = e.target.closest('a.masonry-item'); if(!a) return;
-    e.preventDefault();
-    const img = a.querySelector('img');
-    lightboxImg.src = img.src;
-    lightbox.style.display='flex';
-    requestAnimationFrame(()=>lightbox.classList.add('show'));
-  });
-  lightbox.addEventListener('click', ()=>{
-    lightbox.classList.remove('show');
-    setTimeout(()=>{ lightbox.style.display='none'; lightboxImg.src=''; },250);
-  });
-  window.addEventListener('keydown', e=>{
-    if(e.key==='Escape' && lightbox.classList.contains('show')){
+        // Temporary: mark high priority for images we programmatically want quickly
+        // we set fetchpriority only at assignment time for the above-the-fold set
+        // Try candidate first (likely .webp), fallback on error
+        if(candidate){
+          img.src = candidate;
+          // ensure it decodes asynchronously
+          img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src'); img.removeAttribute('data-src-fallback'); };
+          img.onerror = ()=>{
+            if(fallback && img.src !== fallback){
+              img.src = fallback;
+              img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src'); img.removeAttribute('data-src-fallback'); };
+            } else {
+              img.removeAttribute('data-src');
+            }
+          };
+        } else if(fallback){
+          img.src = fallback;
+          img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src-fallback'); };
+          img.onerror = ()=>{ img.removeAttribute('data-src-fallback'); };
+        }
+
+        obs.unobserve(img);
+      });
+    }, {root:null, rootMargin:'300px 0px', threshold: 0.01});
+    // observe currently present images with data-src/data-src-fallback
+    galleryEl.querySelectorAll('img').forEach(img=>{
+      if(img.getAttribute('data-src') || img.getAttribute('data-src-fallback')){
+        io.observe(img);
+      }
+    });
+  }
+
+  /* --- Fast initial load for first visible images (LCP improvement) --- */
+  function fastLoadFirstN(n){
+    // pick the first n images that have data-src or fallback that are currently in the columns
+    const imgs = Array.from(galleryEl.querySelectorAll('img'));
+    let count = 0;
+    for(let i=0;i<imgs.length && count < n;i++){
+      const img = imgs[i];
+      const candidate = img.getAttribute('data-src');
+      const fallback = img.getAttribute('data-src-fallback');
+      if(!candidate && !fallback) continue;
+      // mark as higher priority for this one-time load
+      try { img.setAttribute('fetchpriority','high'); } catch(e){}
+      // load candidate then fallback (same logic as intersection observer)
+      if(candidate){
+        img.src = candidate;
+        img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src'); img.removeAttribute('data-src-fallback'); img.removeAttribute('fetchpriority'); };
+        img.onerror = ()=>{
+          if(fallback && img.src !== fallback){
+            img.src = fallback;
+            img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src-fallback'); img.removeAttribute('fetchpriority'); };
+          } else {
+            img.removeAttribute('fetchpriority');
+          }
+        };
+      } else if(fallback){
+        img.src = fallback;
+        img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src-fallback'); img.removeAttribute('fetchpriority'); };
+        img.onerror = ()=>{ img.removeAttribute('fetchpriority'); };
+      }
+      count++;
+    }
+  }
+
+  /* --- Lightbox --- */
+  function setupLightbox(){
+    galleryEl.addEventListener('click', e=>{
+      const a = e.target.closest('a.masonry-item');
+      if(!a) return;
+      e.preventDefault();
+      const img = a.querySelector('img');
+      const src = img.src && !(img.getAttribute('data-src')||img.getAttribute('data-src-fallback')) ? img.src : (img.getAttribute('data-src-fallback')||img.getAttribute('data-src')||img.src);
+      lightboxImg.src = src;
+      lightbox.style.display = 'flex';
+      requestAnimationFrame(()=>lightbox.classList.add('show'));
+    });
+    lightbox.addEventListener('click', ()=>{
       lightbox.classList.remove('show');
       setTimeout(()=>{ lightbox.style.display='none'; lightboxImg.src=''; },250);
-    }
-  });
+    });
+    window.addEventListener('keydown', ev=>{
+      if(ev.key==='Escape' && lightbox.classList.contains('show')){
+        lightbox.classList.remove('show');
+        setTimeout(()=>{ lightbox.style.display='none'; lightboxImg.src=''; },250);
+      }
+    });
+  }
 
-  // --- Section switching ---
+  /* --- Section navigation --- */
   function showSection(section){
     galleryEl.style.display='none';
     aboutContent.style.display='none';
     contactContent.style.display='none';
     section.style.display='block';
-    mainIsland.scrollTo({ top:0, behavior:'auto' });
+    mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   }
+
   aboutBtn.addEventListener('click', ()=>showSection(aboutContent));
   contactBtn.addEventListener('click', ()=>showSection(contactContent));
   homeBtn.addEventListener('click', ()=>{
     aboutContent.style.display='none';
     contactContent.style.display='none';
     galleryEl.style.display='flex';
-    mainIsland.scrollTo({ top:0, behavior:'auto' });
+    buildColumns();
+    setupLazyObserver();
+    // fast load first visible images again
+    fastLoadFirstN(3);
+    mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   });
 
-  // --- Init ---
-  buildMasonry();
-  observeImages();
+  /* --- Resize debounce --- */
+  function debounce(fn,wait=150){ let t=null; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
+  window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); fastLoadFirstN(3); },150));
+
+  /* --- Init --- */
+  buildColumns();
+  // fast load the first 3 images immediately (improves LCP but only first 3)
+  fastLoadFirstN(3);
+  setupLazyObserver();
+  setupLightbox();
 })();
 </script>
 
