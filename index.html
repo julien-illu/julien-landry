@@ -284,26 +284,27 @@ main footer {
   const aboutContent = document.getElementById('aboutContent');
   const contactContent = document.getElementById('contactContent');
 
-  // original anchors (kept from initial DOM)
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
 
-  /* --- tiny placeholder SVG (fast) --- */
-  function placeholderSvg(width){
-    const w = Math.max(10, Math.round(width||16));
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  /* --- Small, ultra-fast placeholder --- */
+  function placeholderSvg(){
+    return "data:image/svg+xml;utf8," + encodeURIComponent(
+      "<svg xmlns='http://www.w3.org/2000/svg' width='10' height='7'>" +
+      "<rect width='100%' height='100%' fill='#eee'/></svg>"
+    );
   }
 
-  function getColCount(containerWidth){
-    return (containerWidth <= 700) ? 1 : 3;
+  function getColCount(w){
+    return (w <= 700) ? 1 : 3;
   }
 
   let currentCols = [];
   function buildColumns(){
     galleryEl.innerHTML = '';
     currentCols = [];
-    const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
-    const cols = getColCount(containerWidth);
+
+    const cols = getColCount(galleryEl.clientWidth || window.innerWidth);
+
     for(let i=0;i<cols;i++){
       const col = document.createElement('div');
       col.className = 'masonry-col';
@@ -311,240 +312,115 @@ main footer {
       currentCols.push(col);
     }
 
-    // create items from sourceAnchors but use placeholders + data-src attributes
-    sourceAnchors.forEach(srcAnchor=>{
+    sourceAnchors.forEach(srcA=>{
       const newA = document.createElement('a');
       newA.className = 'masonry-item';
-      newA.href = srcAnchor.getAttribute('href') || '#';
+      newA.href = srcA.getAttribute('href') || '#';
 
-      const originalImg = srcAnchor.querySelector('img');
-      // shallow clone without copying src
-      const img = originalImg.cloneNode(false);
-      const originalSrc = originalImg.getAttribute('src') || '';
+      const original = srcA.querySelector('img');
+      const img = original.cloneNode(false);
+      const fullSrc = original.src;
 
-      // try webp candidate (best-effort). only if different from original.
-      let webpCandidate = '';
-      if(originalSrc && /\.\w+$/.test(originalSrc)){
-        webpCandidate = originalSrc.replace(/\.\w+$/, '.webp');
-        if(webpCandidate === originalSrc) webpCandidate = '';
-      }
+      img.src = placeholderSvg();
+      img.setAttribute("data-full", fullSrc);
+      img.loading = "lazy";
+      img.decoding = "async";
 
-      // set data attributes
-      if(webpCandidate) img.setAttribute('data-src', webpCandidate);
-      if(originalSrc) img.setAttribute('data-src-fallback', originalSrc);
-
-      // attempt counter to avoid infinite retries
-      img.dataset.attempts = '0';
-      // loading guard (prevents observer re-entry)
-      img.dataset.loading = '0';
-
-      img.src = placeholderSvg(16);
-      img.loading = 'lazy';
-      img.decoding = 'async';
       newA.appendChild(img);
 
-      // append to the shortest column
-      let targetCol = currentCols[0];
-      let minHeight = targetCol.offsetHeight;
+      // append to smallest col
+      let target = currentCols[0];
+      let minH = target.offsetHeight;
       for(let c=1;c<currentCols.length;c++){
-        if(currentCols[c].offsetHeight < minHeight){
-          targetCol = currentCols[c];
-          minHeight = currentCols[c].offsetHeight;
+        if(currentCols[c].offsetHeight < minH){
+          target = currentCols[c];
+          minH = currentCols[c].offsetHeight;
         }
       }
-      targetCol.appendChild(newA);
+      target.appendChild(newA);
     });
   }
 
-  /* --- Safe load helper: try candidate then one fallback, no loops --- */
-  function safeLoadImage(img){
-    // guard: don't trigger twice
-    if(!img || img.dataset.loading === '1') return;
-    img.dataset.loading = '1'; // mark started
-    // unobserve handled by caller if needed
-
-    const tryCandidate = img.getAttribute('data-src');
-    const fallback = img.getAttribute('data-src-fallback');
-    const attempts = Number(img.dataset.attempts || '0');
-
-    // helper to finalize
-    function finalize(success){
-      img.removeAttribute('data-src');
-      img.removeAttribute('data-src-fallback');
-      img.dataset.attempts = String(Number(img.dataset.attempts || '0'));
-      img.dataset.loading = '0';
-      // if success, class will be added by onload handler
-    }
-
-    // small helper to attach one-time listeners
-    function attachOnce(target, event, cb){
-      const handler = function(ev){
-        try { cb(ev); } finally { target.removeEventListener(event, handler); }
-      };
-      target.addEventListener(event, handler, { once: true });
-    }
-
-    // if there's a candidate and we haven't tried it yet (attempts === 0)
-    if(tryCandidate && attempts === 0){
-      // prevent IntersectionObserver from re-triggering: observer should unobserve before calling this
-      if(img.src === tryCandidate){
-        // already set, nothing to do
-        finalize(true);
-        img.classList.add('loaded');
-        return;
-      }
-      img.dataset.attempts = String(attempts + 1);
-      // attach onload/onerror ONE TIME
-      attachOnce(img, 'load', ()=>{
-        finalize(true);
-        img.classList.add('loaded');
-      });
-      attachOnce(img, 'error', ()=>{
-        // if fallback exists and is different, try fallback once
-        if(fallback && fallback !== tryCandidate && img.dataset.attempts === '1'){
-          img.dataset.attempts = String(Number(img.dataset.attempts) + 1);
-          // attach final handlers
-          attachOnce(img, 'load', ()=>{
-            finalize(true);
-            img.classList.add('loaded');
-          });
-          attachOnce(img, 'error', ()=>{
-            // final failure - don't retry
-            finalize(false);
-          });
-          // set src to fallback (only once)
-          if(img.src !== fallback) img.src = fallback;
-        } else {
-          // no fallback or already tried fallback -> stop
-          finalize(false);
-        }
-      });
-      // set src to candidate (this will trigger load/error)
-      if(img.src !== tryCandidate) img.src = tryCandidate;
-      return;
-    }
-
-    // if candidate not present but fallback exists and attempts === 0
-    if((!tryCandidate || tryCandidate === '') && fallback && attempts === 0){
-      img.dataset.attempts = String(attempts + 1);
-      attachOnce(img, 'load', ()=>{
-        finalize(true);
-        img.classList.add('loaded');
-      });
-      attachOnce(img, 'error', ()=>{
-        finalize(false);
-      });
-      if(img.src !== fallback) img.src = fallback;
-      return;
-    }
-
-    // if attempts >=1, don't try again
-    finalize(false);
-  }
-
-  /* --- IntersectionObserver (lazy) --- */
+  /* --- Simple lazy loading: ALWAYS loads original image (no webp, no retry loops) --- */
   let io = null;
-  function setupLazyObserver(){
+  function setupLazy(){
     if(io) io.disconnect();
-    io = new IntersectionObserver((entries, obs)=>{
-      entries.forEach(entry=>{
-        if(!entry.isIntersecting) return;
-        const img = entry.target;
-        // if already loading/loaded or attempts > 1, unobserve and skip
-        if(!img || img.dataset.loading === '1' || img.classList.contains('loaded')) {
-          obs.unobserve(img);
-          return;
-        }
-        // unobserve now to avoid re-triggering while we set src
+
+    io = new IntersectionObserver((entries,obs)=>{
+      entries.forEach(e=>{
+        if(!e.isIntersecting) return;
+        const img = e.target;
+        const full = img.getAttribute("data-full");
+        if(!full) return;
+
         obs.unobserve(img);
-        safeLoadImage(img);
+
+        img.onload = ()=> img.classList.add("loaded");
+        img.onerror = ()=> img.classList.add("loaded");
+
+        img.src = full;
+        img.removeAttribute("data-full");
       });
-    }, { root: null, rootMargin: '300px 0px', threshold: 0.01 });
+    }, { rootMargin:"300px 0px", threshold:0.01 });
 
-    // observe imgs that have data-src or data-src-fallback
-    galleryEl.querySelectorAll('img').forEach(img=>{
-      // only observe if it has something to load
-      if((img.getAttribute('data-src') || img.getAttribute('data-src-fallback')) && !img.classList.contains('loaded')){
-        io.observe(img);
-      }
-    });
-  }
-
-  /* --- Fast-load first N images (once only) --- */
-  function fastLoadFirstN(n){
-    const imgs = Array.from(galleryEl.querySelectorAll('img'));
-    let count = 0;
-    for(let i=0;i<imgs.length && count < n;i++){
-      const img = imgs[i];
-      if(!img) continue;
-      if(img.classList.contains('loaded')) { count++; continue; } // already loaded
-      // if already attempted twice, skip
-      if(Number(img.dataset.attempts||'0') >= 2) continue;
-
-      // unobserve to prevent IO loop
-      try { if(io) io.unobserve(img); } catch(e){}
-      safeLoadImage(img);
-      count++;
-    }
+    galleryEl.querySelectorAll("img[data-full]").forEach(img=> io.observe(img));
   }
 
   /* --- Lightbox --- */
   function setupLightbox(){
-    galleryEl.addEventListener('click', e=>{
-      const a = e.target.closest('a.masonry-item');
+    galleryEl.addEventListener("click", e=>{
+      const a = e.target.closest("a.masonry-item");
       if(!a) return;
       e.preventDefault();
-      const img = a.querySelector('img');
-      // prefer fully loaded src, else fallback data
-      const src = (img && img.classList.contains('loaded')) ? img.src
-                  : (img && (img.getAttribute('data-src-fallback') || img.getAttribute('data-src') || img.src));
+
+      const img = a.querySelector("img");
+      const src = img.classList.contains("loaded") ? img.src : (img.getAttribute("data-full") || img.src);
+
       lightboxImg.src = src;
-      lightbox.style.display = 'flex';
-      requestAnimationFrame(()=>lightbox.classList.add('show'));
+      lightbox.style.display="flex";
+      requestAnimationFrame(()=> lightbox.classList.add("show"));
     });
-    lightbox.addEventListener('click', ()=>{
-      lightbox.classList.remove('show');
-      setTimeout(()=>{ lightbox.style.display='none'; lightboxImg.src=''; },250);
+
+    lightbox.addEventListener("click", ()=>{
+      lightbox.classList.remove("show");
+      setTimeout(()=>{ lightbox.style.display="none"; lightboxImg.src=""; },250);
     });
-    window.addEventListener('keydown', ev=>{
-      if(ev.key === 'Escape' && lightbox.classList.contains('show')){
-        lightbox.classList.remove('show');
-        setTimeout(()=>{ lightbox.style.display='none'; lightboxImg.src=''; },250);
+
+    window.addEventListener("keydown", e=>{
+      if(e.key==="Escape"){
+        lightbox.classList.remove("show");
+        setTimeout(()=>{ lightbox.style.display="none"; lightboxImg.src=""; },250);
       }
     });
   }
 
-  /* --- Section navigation --- */
-  function showSection(section){
-    galleryEl.style.display='none';
-    aboutContent.style.display='none';
-    contactContent.style.display='none';
-    section.style.display='block';
-    mainIsland.scrollTo({ top: 0, behavior: 'auto' });
+  /* --- NAV --- */
+  function showSection(sec){
+    galleryEl.style.display="none";
+    aboutContent.style.display="none";
+    contactContent.style.display="none";
+    sec.style.display="block";
+    mainIsland.scrollTo({top:0, behavior:"auto"});
   }
-
-  aboutBtn.addEventListener('click', ()=>showSection(aboutContent));
-  contactBtn.addEventListener('click', ()=>showSection(contactContent));
-  homeBtn.addEventListener('click', ()=>{
-    aboutContent.style.display='none';
-    contactContent.style.display='none';
-    galleryEl.style.display='flex';
+  aboutBtn.onclick = ()=> showSection(aboutContent);
+  contactBtn.onclick = ()=> showSection(contactContent);
+  homeBtn.onclick = ()=>{
+    aboutContent.style.display="none";
+    contactContent.style.display="none";
+    galleryEl.style.display="flex";
     buildColumns();
-    setupLazyObserver();
-    // fast load top images (safe)
-    fastLoadFirstN(3);
-    mainIsland.scrollTo({ top: 0, behavior: 'auto' });
+    setupLazy();
+    mainIsland.scrollTo({top:0, behavior:"auto"});
+  };
+
+  window.addEventListener("resize", ()=>{
+    buildColumns();
+    setupLazy();
   });
 
-  /* --- Resize debounce --- */
-  function debounce(fn, wait = 150){ let t = null; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); }; }
-  window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); fastLoadFirstN(3); }, 150));
-
-  /* --- Init --- */
+  /* --- INIT --- */
   buildColumns();
-  // first-3 fast load (one-time, safe)
-  fastLoadFirstN(3);
-  setupLazyObserver();
+  setupLazy();
   setupLightbox();
 })();
 </script>
