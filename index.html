@@ -112,7 +112,6 @@ main h1 {
   height: auto;
   display: block;
   border-radius: 8px;
-  /* léger blur pour effet "progressif" (plus petit que précédemment) */
   filter: blur(6px);
   transform: scale(1.02);
   transition: filter 0.45s ease, transform 0.45s ease, opacity 0.3s ease;
@@ -232,16 +231,16 @@ main footer {
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/chateau_sans.webp" alt="Immagination 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/layout_afca02.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/picnic.webp" alt="Picnicmonstre" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/portrait_preview.webp" alt="Portrait 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/carnet01.webp" alt="Portrait 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/paysage_preview.webp" alt="Paysage 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/medicis.webp" alt="Paysage 2" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.webp" alt="Paysage 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Immagination 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/chateau_sans.jpg" alt="Immagination 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/layout_afca02.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/picnic.png" alt="Picnicmonstre" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/portrait_preview.png" alt="Portrait 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/carnet01.jpg" alt="Portrait 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/paysage_preview.jpg" alt="Paysage 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/medicis.jpg" alt="Paysage 2" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.jpg" alt="Paysage 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
   </div>
 
   <div id="aboutContent">
@@ -285,10 +284,10 @@ main footer {
   const aboutContent = document.getElementById('aboutContent');
   const contactContent = document.getElementById('contactContent');
 
-  // On récupère les anchors originales (elles existent puisque le script est à la fin du body)
+  // original anchors (kept from initial DOM)
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
 
-  /* --- Masonry layout --- */
+  /* --- tiny placeholder SVG (fast) --- */
   function placeholderSvg(width){
     const w = Math.max(10, Math.round(width||16));
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
@@ -299,45 +298,46 @@ main footer {
     return (containerWidth <= 700) ? 1 : 3;
   }
 
-  let currentCols=[];
+  let currentCols = [];
   function buildColumns(){
-    // clear existing gallery DOM (only the columns) but keep sourceAnchors array intact
-    galleryEl.innerHTML='';
-    currentCols=[];
+    galleryEl.innerHTML = '';
+    currentCols = [];
     const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
     const cols = getColCount(containerWidth);
     for(let i=0;i<cols;i++){
-      const col=document.createElement('div');
-      col.className='masonry-col';
+      const col = document.createElement('div');
+      col.className = 'masonry-col';
       galleryEl.appendChild(col);
       currentCols.push(col);
     }
 
-    // place items evenly (lowest column height first)
+    // create items from sourceAnchors but use placeholders + data-src attributes
     sourceAnchors.forEach(srcAnchor=>{
-      const newA=document.createElement('a');
-      newA.className='masonry-item';
-      // keep original href (if empty, '#')
+      const newA = document.createElement('a');
+      newA.className = 'masonry-item';
       newA.href = srcAnchor.getAttribute('href') || '#';
 
-      // clone image but do NOT keep its src (we will use placeholder + data-src mechanism)
       const originalImg = srcAnchor.querySelector('img');
-      const img = originalImg.cloneNode(false); // shallow clone (no src)
+      // shallow clone without copying src
+      const img = originalImg.cloneNode(false);
       const originalSrc = originalImg.getAttribute('src') || '';
-      // Prefer .webp variant if server provides it (we attempt; fallback to original)
+
+      // try webp candidate (best-effort). only if different from original.
       let webpCandidate = '';
-      if(originalSrc){
-        // replace extension by .webp (best-effort)
-        webpCandidate = originalSrc.replace(/\.\w+$/,'') + '.webp';
+      if(originalSrc && /\.\w+$/.test(originalSrc)){
+        webpCandidate = originalSrc.replace(/\.\w+$/, '.webp');
+        if(webpCandidate === originalSrc) webpCandidate = '';
       }
 
-      // store potential sources
-      img.setAttribute('data-src-fallback', originalSrc);
-      // store candidate webp - we'll try it first; onerror we fallback
+      // set data attributes
       if(webpCandidate) img.setAttribute('data-src', webpCandidate);
-      else img.setAttribute('data-src', originalSrc);
+      if(originalSrc) img.setAttribute('data-src-fallback', originalSrc);
 
-      // set tiny placeholder so layout is fast and nothing is huge
+      // attempt counter to avoid infinite retries
+      img.dataset.attempts = '0';
+      // loading guard (prevents observer re-entry)
+      img.dataset.loading = '0';
+
       img.src = placeholderSvg(16);
       img.loading = 'lazy';
       img.decoding = 'async';
@@ -356,7 +356,93 @@ main footer {
     });
   }
 
-  /* --- Lazy loading --- */
+  /* --- Safe load helper: try candidate then one fallback, no loops --- */
+  function safeLoadImage(img){
+    // guard: don't trigger twice
+    if(!img || img.dataset.loading === '1') return;
+    img.dataset.loading = '1'; // mark started
+    // unobserve handled by caller if needed
+
+    const tryCandidate = img.getAttribute('data-src');
+    const fallback = img.getAttribute('data-src-fallback');
+    const attempts = Number(img.dataset.attempts || '0');
+
+    // helper to finalize
+    function finalize(success){
+      img.removeAttribute('data-src');
+      img.removeAttribute('data-src-fallback');
+      img.dataset.attempts = String(Number(img.dataset.attempts || '0'));
+      img.dataset.loading = '0';
+      // if success, class will be added by onload handler
+    }
+
+    // small helper to attach one-time listeners
+    function attachOnce(target, event, cb){
+      const handler = function(ev){
+        try { cb(ev); } finally { target.removeEventListener(event, handler); }
+      };
+      target.addEventListener(event, handler, { once: true });
+    }
+
+    // if there's a candidate and we haven't tried it yet (attempts === 0)
+    if(tryCandidate && attempts === 0){
+      // prevent IntersectionObserver from re-triggering: observer should unobserve before calling this
+      if(img.src === tryCandidate){
+        // already set, nothing to do
+        finalize(true);
+        img.classList.add('loaded');
+        return;
+      }
+      img.dataset.attempts = String(attempts + 1);
+      // attach onload/onerror ONE TIME
+      attachOnce(img, 'load', ()=>{
+        finalize(true);
+        img.classList.add('loaded');
+      });
+      attachOnce(img, 'error', ()=>{
+        // if fallback exists and is different, try fallback once
+        if(fallback && fallback !== tryCandidate && img.dataset.attempts === '1'){
+          img.dataset.attempts = String(Number(img.dataset.attempts) + 1);
+          // attach final handlers
+          attachOnce(img, 'load', ()=>{
+            finalize(true);
+            img.classList.add('loaded');
+          });
+          attachOnce(img, 'error', ()=>{
+            // final failure - don't retry
+            finalize(false);
+          });
+          // set src to fallback (only once)
+          if(img.src !== fallback) img.src = fallback;
+        } else {
+          // no fallback or already tried fallback -> stop
+          finalize(false);
+        }
+      });
+      // set src to candidate (this will trigger load/error)
+      if(img.src !== tryCandidate) img.src = tryCandidate;
+      return;
+    }
+
+    // if candidate not present but fallback exists and attempts === 0
+    if((!tryCandidate || tryCandidate === '') && fallback && attempts === 0){
+      img.dataset.attempts = String(attempts + 1);
+      attachOnce(img, 'load', ()=>{
+        finalize(true);
+        img.classList.add('loaded');
+      });
+      attachOnce(img, 'error', ()=>{
+        finalize(false);
+      });
+      if(img.src !== fallback) img.src = fallback;
+      return;
+    }
+
+    // if attempts >=1, don't try again
+    finalize(false);
+  }
+
+  /* --- IntersectionObserver (lazy) --- */
   let io = null;
   function setupLazyObserver(){
     if(io) io.disconnect();
@@ -364,74 +450,40 @@ main footer {
       entries.forEach(entry=>{
         if(!entry.isIntersecting) return;
         const img = entry.target;
-        const candidate = img.getAttribute('data-src');
-        const fallback = img.getAttribute('data-src-fallback');
-        if(!candidate && !fallback){
+        // if already loading/loaded or attempts > 1, unobserve and skip
+        if(!img || img.dataset.loading === '1' || img.classList.contains('loaded')) {
           obs.unobserve(img);
           return;
         }
-
-        // Temporary: mark high priority for images we programmatically want quickly
-        // we set fetchpriority only at assignment time for the above-the-fold set
-        // Try candidate first (likely .webp), fallback on error
-        if(candidate){
-          img.src = candidate;
-          // ensure it decodes asynchronously
-          img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src'); img.removeAttribute('data-src-fallback'); };
-          img.onerror = ()=>{
-            if(fallback && img.src !== fallback){
-              img.src = fallback;
-              img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src'); img.removeAttribute('data-src-fallback'); };
-            } else {
-              img.removeAttribute('data-src');
-            }
-          };
-        } else if(fallback){
-          img.src = fallback;
-          img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src-fallback'); };
-          img.onerror = ()=>{ img.removeAttribute('data-src-fallback'); };
-        }
-
+        // unobserve now to avoid re-triggering while we set src
         obs.unobserve(img);
+        safeLoadImage(img);
       });
-    }, {root:null, rootMargin:'300px 0px', threshold: 0.01});
-    // observe currently present images with data-src/data-src-fallback
+    }, { root: null, rootMargin: '300px 0px', threshold: 0.01 });
+
+    // observe imgs that have data-src or data-src-fallback
     galleryEl.querySelectorAll('img').forEach(img=>{
-      if(img.getAttribute('data-src') || img.getAttribute('data-src-fallback')){
+      // only observe if it has something to load
+      if((img.getAttribute('data-src') || img.getAttribute('data-src-fallback')) && !img.classList.contains('loaded')){
         io.observe(img);
       }
     });
   }
 
-  /* --- Fast initial load for first visible images (LCP improvement) --- */
+  /* --- Fast-load first N images (once only) --- */
   function fastLoadFirstN(n){
-    // pick the first n images that have data-src or fallback that are currently in the columns
     const imgs = Array.from(galleryEl.querySelectorAll('img'));
     let count = 0;
     for(let i=0;i<imgs.length && count < n;i++){
       const img = imgs[i];
-      const candidate = img.getAttribute('data-src');
-      const fallback = img.getAttribute('data-src-fallback');
-      if(!candidate && !fallback) continue;
-      // mark as higher priority for this one-time load
-      try { img.setAttribute('fetchpriority','high'); } catch(e){}
-      // load candidate then fallback (same logic as intersection observer)
-      if(candidate){
-        img.src = candidate;
-        img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src'); img.removeAttribute('data-src-fallback'); img.removeAttribute('fetchpriority'); };
-        img.onerror = ()=>{
-          if(fallback && img.src !== fallback){
-            img.src = fallback;
-            img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src-fallback'); img.removeAttribute('fetchpriority'); };
-          } else {
-            img.removeAttribute('fetchpriority');
-          }
-        };
-      } else if(fallback){
-        img.src = fallback;
-        img.onload = ()=>{ img.classList.add('loaded'); img.removeAttribute('data-src-fallback'); img.removeAttribute('fetchpriority'); };
-        img.onerror = ()=>{ img.removeAttribute('fetchpriority'); };
-      }
+      if(!img) continue;
+      if(img.classList.contains('loaded')) { count++; continue; } // already loaded
+      // if already attempted twice, skip
+      if(Number(img.dataset.attempts||'0') >= 2) continue;
+
+      // unobserve to prevent IO loop
+      try { if(io) io.unobserve(img); } catch(e){}
+      safeLoadImage(img);
       count++;
     }
   }
@@ -443,7 +495,9 @@ main footer {
       if(!a) return;
       e.preventDefault();
       const img = a.querySelector('img');
-      const src = img.src && !(img.getAttribute('data-src')||img.getAttribute('data-src-fallback')) ? img.src : (img.getAttribute('data-src-fallback')||img.getAttribute('data-src')||img.src);
+      // prefer fully loaded src, else fallback data
+      const src = (img && img.classList.contains('loaded')) ? img.src
+                  : (img && (img.getAttribute('data-src-fallback') || img.getAttribute('data-src') || img.src));
       lightboxImg.src = src;
       lightbox.style.display = 'flex';
       requestAnimationFrame(()=>lightbox.classList.add('show'));
@@ -453,7 +507,7 @@ main footer {
       setTimeout(()=>{ lightbox.style.display='none'; lightboxImg.src=''; },250);
     });
     window.addEventListener('keydown', ev=>{
-      if(ev.key==='Escape' && lightbox.classList.contains('show')){
+      if(ev.key === 'Escape' && lightbox.classList.contains('show')){
         lightbox.classList.remove('show');
         setTimeout(()=>{ lightbox.style.display='none'; lightboxImg.src=''; },250);
       }
@@ -477,18 +531,18 @@ main footer {
     galleryEl.style.display='flex';
     buildColumns();
     setupLazyObserver();
-    // fast load first visible images again
+    // fast load top images (safe)
     fastLoadFirstN(3);
     mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   });
 
   /* --- Resize debounce --- */
-  function debounce(fn,wait=150){ let t=null; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
-  window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); fastLoadFirstN(3); },150));
+  function debounce(fn, wait = 150){ let t = null; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); }; }
+  window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); fastLoadFirstN(3); }, 150));
 
   /* --- Init --- */
   buildColumns();
-  // fast load the first 3 images immediately (improves LCP but only first 3)
+  // first-3 fast load (one-time, safe)
   fastLoadFirstN(3);
   setupLazyObserver();
   setupLightbox();
