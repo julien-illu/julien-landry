@@ -112,9 +112,9 @@ main h1 {
   height: auto;
   display: block;
   border-radius: 8px;
-  filter: blur(6px);
-  transform: scale(1.02);
-  transition: filter 0.45s ease, transform 0.45s ease, opacity 0.3s ease;
+  filter: blur(18px);
+  transform: scale(1.03);
+  transition: filter 0.6s ease, transform 0.6s ease, opacity 0.4s ease;
   opacity: 0.95;
 }
 
@@ -231,16 +231,16 @@ main footer {
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/chateau_sans.webp" alt="Immagination 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/layout_afca02.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/picnic.webp" alt="Picnicmonstre" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/portrait_preview.webp" alt="Portrait 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/carnet01.webp" alt="Portrait 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/paysage_preview.webp" alt="Paysage 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/medicis.webp" alt="Paysage 2" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.webp" alt="Paysage 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.png" alt="Immagination 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/chateau_sans.jpg" alt="Immagination 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/layout_afca02.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/picnic.png" alt="Picnicmonstre" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/portrait_preview.png" alt="Portrait 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/carnet01.jpg" alt="Portrait 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/paysage_preview.jpg" alt="Paysage 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/medicis.jpg" alt="Paysage 2" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.jpg" alt="Paysage 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.jpg" alt="Ettalong - crayon pastel" loading="lazy"></a>
   </div>
 
   <div id="aboutContent">
@@ -283,144 +283,126 @@ main footer {
   const mainIsland = document.getElementById('mainIsland');
   const aboutContent = document.getElementById('aboutContent');
   const contactContent = document.getElementById('contactContent');
-
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
 
-  /* --- Small, ultra-fast placeholder --- */
-  function placeholderSvg(){
-    return "data:image/svg+xml;utf8," + encodeURIComponent(
-      "<svg xmlns='http://www.w3.org/2000/svg' width='10' height='7'>" +
-      "<rect width='100%' height='100%' fill='#eee'/></svg>"
-    );
+  /* --- Masonry layout --- */
+  function placeholderSvg(width){
+    const w = Math.max(10, Math.round(width||16));
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
 
-  function getColCount(w){
-    return (w <= 700) ? 1 : 3;
+  function getColCount(containerWidth){
+    return (containerWidth <= 700) ? 1 : 3;
   }
 
-  let currentCols = [];
+  let currentCols=[];
   function buildColumns(){
-    galleryEl.innerHTML = '';
-    currentCols = [];
-
-    const cols = getColCount(galleryEl.clientWidth || window.innerWidth);
-
+    galleryEl.innerHTML='';
+    currentCols=[];
+    const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
+    const cols = getColCount(containerWidth);
     for(let i=0;i<cols;i++){
-      const col = document.createElement('div');
-      col.className = 'masonry-col';
+      const col=document.createElement('div');
+      col.className='masonry-col';
       galleryEl.appendChild(col);
       currentCols.push(col);
     }
-
-    sourceAnchors.forEach(srcA=>{
-      const newA = document.createElement('a');
-      newA.className = 'masonry-item';
-      newA.href = srcA.getAttribute('href') || '#';
-
-      const original = srcA.querySelector('img');
-      const img = original.cloneNode(false);
-      const fullSrc = original.src;
-
-      img.src = placeholderSvg();
-      img.setAttribute("data-full", fullSrc);
-      img.loading = "lazy";
-      img.decoding = "async";
-
+    sourceAnchors.forEach(srcAnchor=>{
+      const newA=document.createElement('a');
+      newA.className='masonry-item';
+      newA.href=srcAnchor.getAttribute('href')||'#';
+      const img=srcAnchor.querySelector('img').cloneNode(true);
+      const originalSrc=img.getAttribute('src')||'';
+      img.setAttribute('data-src', originalSrc);
+      img.src=placeholderSvg(16);
+      img.loading='lazy';
+      img.decoding='async';
       newA.appendChild(img);
 
-      // append to smallest col
-      let target = currentCols[0];
-      let minH = target.offsetHeight;
+      let targetCol=currentCols[0];
+      let minHeight=targetCol.offsetHeight;
       for(let c=1;c<currentCols.length;c++){
-        if(currentCols[c].offsetHeight < minH){
-          target = currentCols[c];
-          minH = currentCols[c].offsetHeight;
+        if(currentCols[c].offsetHeight<minHeight){
+          targetCol=currentCols[c];
+          minHeight=currentCols[c].offsetHeight;
         }
       }
-      target.appendChild(newA);
+      targetCol.appendChild(newA);
     });
   }
 
-  /* --- Simple lazy loading: ALWAYS loads original image (no webp, no retry loops) --- */
-  let io = null;
-  function setupLazy(){
+  /* --- Lazy loading --- */
+  let io=null;
+  function setupLazyObserver(){
     if(io) io.disconnect();
-
-    io = new IntersectionObserver((entries,obs)=>{
-      entries.forEach(e=>{
-        if(!e.isIntersecting) return;
-        const img = e.target;
-        const full = img.getAttribute("data-full");
-        if(!full) return;
-
+    io=new IntersectionObserver((entries,obs)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        const img=entry.target;
+        const full=img.getAttribute('data-src');
+        if(full){
+          img.src=full;
+          img.onload=()=>{img.classList.add('loaded'); img.removeAttribute('data-src');};
+          img.onerror=()=>img.removeAttribute('data-src');
+        }
         obs.unobserve(img);
-
-        img.onload = ()=> img.classList.add("loaded");
-        img.onerror = ()=> img.classList.add("loaded");
-
-        img.src = full;
-        img.removeAttribute("data-full");
       });
-    }, { rootMargin:"300px 0px", threshold:0.01 });
-
-    galleryEl.querySelectorAll("img[data-full]").forEach(img=> io.observe(img));
+    }, {root:null, rootMargin:'250px 0px', threshold:0.01});
+    galleryEl.querySelectorAll('img[data-src]').forEach(img=>io.observe(img));
   }
 
   /* --- Lightbox --- */
   function setupLightbox(){
-    galleryEl.addEventListener("click", e=>{
-      const a = e.target.closest("a.masonry-item");
+    galleryEl.addEventListener('click', e=>{
+      const a=e.target.closest('a.masonry-item');
       if(!a) return;
       e.preventDefault();
-
-      const img = a.querySelector("img");
-      const src = img.classList.contains("loaded") ? img.src : (img.getAttribute("data-full") || img.src);
-
-      lightboxImg.src = src;
-      lightbox.style.display="flex";
-      requestAnimationFrame(()=> lightbox.classList.add("show"));
+      const img=a.querySelector('img');
+      const src=img.src && !img.hasAttribute('data-src') ? img.src : img.getAttribute('data-src')||img.src;
+      lightboxImg.src=src;
+      lightbox.style.display='flex';
+      requestAnimationFrame(()=>lightbox.classList.add('show'));
     });
-
-    lightbox.addEventListener("click", ()=>{
-      lightbox.classList.remove("show");
-      setTimeout(()=>{ lightbox.style.display="none"; lightboxImg.src=""; },250);
+    lightbox.addEventListener('click', ()=>{
+      lightbox.classList.remove('show');
+      setTimeout(()=>{lightbox.style.display='none'; lightboxImg.src='';},250);
     });
-
-    window.addEventListener("keydown", e=>{
-      if(e.key==="Escape"){
-        lightbox.classList.remove("show");
-        setTimeout(()=>{ lightbox.style.display="none"; lightboxImg.src=""; },250);
+    window.addEventListener('keydown', ev=>{
+      if(ev.key==='Escape' && lightbox.classList.contains('show')){
+        lightbox.classList.remove('show');
+        setTimeout(()=>{lightbox.style.display='none'; lightboxImg.src='';},250);
       }
     });
   }
 
-  /* --- NAV --- */
-  function showSection(sec){
-    galleryEl.style.display="none";
-    aboutContent.style.display="none";
-    contactContent.style.display="none";
-    sec.style.display="block";
-    mainIsland.scrollTo({top:0, behavior:"auto"});
+  /* --- Section navigation --- */
+  function showSection(section){
+    galleryEl.style.display='none';
+    aboutContent.style.display='none';
+    contactContent.style.display='none';
+    section.style.display='block';
+    mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   }
-  aboutBtn.onclick = ()=> showSection(aboutContent);
-  contactBtn.onclick = ()=> showSection(contactContent);
-  homeBtn.onclick = ()=>{
-    aboutContent.style.display="none";
-    contactContent.style.display="none";
-    galleryEl.style.display="flex";
-    buildColumns();
-    setupLazy();
-    mainIsland.scrollTo({top:0, behavior:"auto"});
-  };
 
-  window.addEventListener("resize", ()=>{
+  aboutBtn.addEventListener('click', ()=>showSection(aboutContent));
+  contactBtn.addEventListener('click', ()=>showSection(contactContent));
+  homeBtn.addEventListener('click', ()=>{
+    aboutContent.style.display='none';
+    contactContent.style.display='none';
+    galleryEl.style.display='flex';
     buildColumns();
-    setupLazy();
+    setupLazyObserver();
+    mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   });
 
-  /* --- INIT --- */
+  /* --- Resize debounce --- */
+  function debounce(fn,wait=150){ let t=null; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
+  window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); },150));
+
+  /* --- Init --- */
   buildColumns();
-  setupLazy();
+  setupLazyObserver();
   setupLightbox();
 })();
 </script>
