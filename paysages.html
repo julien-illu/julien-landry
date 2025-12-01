@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Julien Landry – Dessin & Peinture</title>
+  <style>
+    /* --- Reset / Base --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background-color: #5a5e5f;
+      color: #333;
+    }
+
+    /* --- Import Riccione Serial XLight font --- */
+    @font-face {
+      font-family: 'Riccione Serial XLight';
+      src: url('riccione-serial-xlight.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    /* --- Header --- */
+    header {
+      background-color: #d9d9d9;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 25px;
+      font-size: 16px;
+    }
+
+    header a {
+      text-decoration: none;
+      color: #333;
+      transition: color 0.2s;
+      font-size: 18px;
+      padding: 10px 15px;
+      letter-spacing: 0.03em;
+    }
+
+    header a:hover {
+      color: #666;
+      background-color: rgba(0,0,0,0.05);
+      border-radius: 4px;
+    }
+
+    /* --- Main container --- */
+    main {
+      background-color: #eeeaea;
+      max-width: 1500px;
+      margin: 100px auto 40px auto;
+      padding: 60px;
+      border-radius: 4px;
+    }
+
+    main h1 {
+      text-align: center;
+      font-size: 5em;
+      margin-bottom: 40px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      font-family: 'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    /* --- Masonry Gallery --- */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-auto-rows: 15px; /* small row height for fine control */
+      gap: 25px;
+      justify-items: center;
+    }
+
+    .gallery a {
+      display: block;
+      grid-row-end: span var(--span);
+    }
+
+    .gallery img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+    <a href="#">Instagram</a>
+  </header>
+
+  <main>
+    <h1>Julien Landry</h1>
+    <div class="gallery">
+      <a href="#"><img src="https://via.placeholder.com/300x200" alt="Aenean Facili"></a>
+      <a href="#"><img src="https://via.placeholder.com/300x400" alt="Mauris Lan"></a>
+      <a href="#"><img src="https://via.placeholder.com/300x200" alt="Quisque Vita Est"></a>
+      <a href="#"><img src="https://via.placeholder.com/300x400" alt="Portrait"></a>
+      <a href="#"><img src="https://via.placeholder.com/300x400" alt="Painting"></a>
+    </div>
+  </main>
+
+  <script>
+    // Masonry resizing
+    const gallery = document.querySelector('.gallery');
+    const items = gallery.querySelectorAll('a');
+
+    function resizeMasonryItem(item) {
+      const rowHeight = parseInt(window.getComputedStyle(gallery).getPropertyValue('grid-auto-rows'));
+      const rowGap = parseInt(window.getComputedStyle(gallery).getPropertyValue('gap'));
+      const img = item.querySelector('img');
+      const span = Math.ceil((img.offsetHeight + rowGap) / (rowHeight + rowGap));
+      item.style.setProperty('--span', span);
+    }
+
+    items.forEach(item => {
+      const img = item.querySelector('img');
+      if (img.complete) resizeMasonryItem(item);
+      else img.addEventListener('load', () => resizeMasonryItem(item));
+    });
+
+    window.addEventListener('resize', () => {
+      items.forEach(item => resizeMasonryItem(item));
+    });
+  </script>
+
+</body>
+</html>
