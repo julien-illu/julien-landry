@@ -406,6 +406,45 @@ main footer {
   setupLightbox();
 })();
 </script>
+<script>
+(function(){
+  // surveille toutes les images de la galerie et log les erreurs réseau
+  const imgs = document.querySelectorAll('.gallery img');
+  imgs.forEach(img=>{
+    // si l'image n'est pas encore chargée (data-src case), cible la valeur finale
+    const src = img.getAttribute('data-src') || img.src;
+    // test via fetch pour voir le status
+    fetch(src, { method: 'HEAD' }).then(resp=>{
+      if(!resp.ok){
+        console.error('IMAGE PROBLEM:', src, 'status=', resp.status);
+        // tentative de fallback automatique: try same basename with .png then .jpg
+        const base = src.replace(/(\.webp|\.png|\.jpg|\.jpeg)$/i,'');
+        const tryCandidates = [base + '.png', base + '.jpg'];
+        (async function tryFallback(i){
+          if(i >= tryCandidates.length) return;
+          try {
+            const r = await fetch(tryCandidates[i], { method: 'HEAD' });
+            if(r.ok){
+              console.warn('FALLBACK AVAILABLE:', tryCandidates[i], ' — remplacer src temporairement pour test.');
+              img.src = tryCandidates[i]; // affiche le fallback
+              return;
+            } else {
+              return tryFallback(i+1);
+            }
+          } catch(e){
+            return tryFallback(i+1);
+          }
+        })(0);
+      } else {
+        console.log('OK image:', src);
+      }
+    }).catch(err=>{
+      console.error('FETCH ERROR for', src, err);
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
+
