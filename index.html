@@ -297,42 +297,81 @@ main footer {
   }
 
   let currentCols=[];
-  function buildColumns(){
-    galleryEl.innerHTML='';
-    currentCols=[];
+  let galleryBuilt=false;
+
+  function buildColumns(force=false){
     const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
     const cols = getColCount(containerWidth);
-    for(let i=0;i<cols;i++){
-      const col=document.createElement('div');
-      col.className='masonry-col';
-      galleryEl.appendChild(col);
-      currentCols.push(col);
-    }
-    sourceAnchors.forEach(srcAnchor=>{
-      const newA=document.createElement('a');
-      newA.className='masonry-item';
-      newA.href=srcAnchor.getAttribute('href')||'#';
-      const img=srcAnchor.querySelector('img').cloneNode(true);
-      const originalSrc=img.getAttribute('src')||'';
-      img.setAttribute('data-src', originalSrc);
-      img.src=placeholderSvg(16);
-      img.loading='lazy';
-      img.decoding='async';
-      newA.appendChild(img);
 
-      let targetCol=currentCols[0];
-      let minHeight=targetCol.offsetHeight;
-      for(let c=1;c<currentCols.length;c++){
-        if(currentCols[c].offsetHeight<minHeight){
-          targetCol=currentCols[c];
-          minHeight=currentCols[c].offsetHeight;
-        }
+    // Si déjà construit et le nombre de colonnes n'a pas changé, ne rien faire
+    if(galleryBuilt && currentCols.length === cols && !force) return;
+
+    // Créer ou ajuster les colonnes
+    if(!galleryBuilt){
+      currentCols=[];
+      for(let i=0;i<cols;i++){
+        const col=document.createElement('div');
+        col.className='masonry-col';
+        galleryEl.appendChild(col);
+        currentCols.push(col);
       }
-      targetCol.appendChild(newA);
-    });
+      sourceAnchors.forEach(srcAnchor=>{
+        const newA=document.createElement('a');
+        newA.className='masonry-item';
+        newA.href=srcAnchor.getAttribute('href')||'#';
+        const img=srcAnchor.querySelector('img').cloneNode(true);
+        const originalSrc=img.getAttribute('src')||'';
+        img.setAttribute('data-src', originalSrc);
+
+        // Si l'image n'a pas encore été chargée, mettre le placeholder
+        if(!img.complete && !img.classList.contains('loaded')){
+          img.src=placeholderSvg(16);
+          img.loading='lazy';
+          img.decoding='async';
+        } else {
+          img.classList.add('loaded');
+        }
+
+        newA.appendChild(img);
+
+        // Ajouter à la colonne la plus courte
+        let targetCol=currentCols[0];
+        let minHeight=targetCol.offsetHeight;
+        for(let c=1;c<currentCols.length;c++){
+          if(currentCols[c].offsetHeight<minHeight){
+            targetCol=currentCols[c];
+            minHeight=currentCols[c].offsetHeight;
+          }
+        }
+        targetCol.appendChild(newA);
+      });
+      galleryBuilt=true;
+    } else {
+      // Ajustement des colonnes existantes si le nombre change
+      const allItems = Array.from(galleryEl.querySelectorAll('.masonry-item'));
+      galleryEl.innerHTML=''; // Recrée colonnes
+      currentCols=[];
+      for(let i=0;i<cols;i++){
+        const col=document.createElement('div');
+        col.className='masonry-col';
+        galleryEl.appendChild(col);
+        currentCols.push(col);
+      }
+      allItems.forEach(item=>{
+        let targetCol=currentCols[0];
+        let minHeight=targetCol.offsetHeight;
+        for(let c=1;c<currentCols.length;c++){
+          if(currentCols[c].offsetHeight<minHeight){
+            targetCol=currentCols[c];
+            minHeight=currentCols[c].offsetHeight;
+          }
+        }
+        targetCol.appendChild(item);
+      });
+    }
   }
 
-  /* --- Lazy loading optimisé --- */
+  /* --- Lazy loading --- */
   let io=null;
   function setupLazyObserver(){
     if(io) io.disconnect();
@@ -342,16 +381,9 @@ main footer {
         const img=entry.target;
         const full=img.getAttribute('data-src');
         if(full){
-          const preloadImg = new Image();
-          preloadImg.src = full;
-          preloadImg.decoding = 'async';
-          preloadImg.fetchPriority = 'high';
-          preloadImg.onload = () => {
-            img.src = full;
-            img.classList.add('loaded');
-            img.removeAttribute('data-src');
-          };
-          preloadImg.onerror = () => img.removeAttribute('data-src');
+          img.src=full;
+          img.onload=()=>{img.classList.add('loaded'); img.removeAttribute('data-src');};
+          img.onerror=()=>img.removeAttribute('data-src');
         }
         obs.unobserve(img);
       });
@@ -398,7 +430,7 @@ main footer {
     aboutContent.style.display='none';
     contactContent.style.display='none';
     galleryEl.style.display='flex';
-    buildColumns();
+    buildColumns(true); // rebuild forcé si resize
     setupLazyObserver();
     mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   });
