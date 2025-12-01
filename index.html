@@ -332,7 +332,7 @@ main footer {
     });
   }
 
-  /* --- Lazy loading --- */
+  /* --- Lazy loading optimisé --- */
   let io=null;
   function setupLazyObserver(){
     if(io) io.disconnect();
@@ -342,9 +342,16 @@ main footer {
         const img=entry.target;
         const full=img.getAttribute('data-src');
         if(full){
-          img.src=full;
-          img.onload=()=>{img.classList.add('loaded'); img.removeAttribute('data-src');};
-          img.onerror=()=>img.removeAttribute('data-src');
+          const preloadImg = new Image();
+          preloadImg.src = full;
+          preloadImg.decoding = 'async';
+          preloadImg.fetchPriority = 'high';
+          preloadImg.onload = () => {
+            img.src = full;
+            img.classList.add('loaded');
+            img.removeAttribute('data-src');
+          };
+          preloadImg.onerror = () => img.removeAttribute('data-src');
         }
         obs.unobserve(img);
       });
