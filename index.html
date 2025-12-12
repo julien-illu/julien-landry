@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,7 +15,6 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #5a5e5f;
   color: #333;
-  /* On laisse le body scroller naturellement pour éviter les bugs mobile */
   overflow-x: hidden;
 }
 
@@ -34,8 +34,8 @@ header {
   gap: 25px;
   position: sticky;
   top: 0;
-  z-index: 100; /* Augmenté pour passer au dessus de la maçonnerie */
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Petit ajout pour le détacher */
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 header .homeBtn {
@@ -69,7 +69,7 @@ header a.navLink:hover { color: #666; background-color: rgba(0,0,0,0.05); }
 main {
   background-color: #eeeaea;
   max-width: 1500px;
-  margin: 40px auto; /* Marges réduites pour mieux passer sur petit écran */
+  margin: 40px auto;
   padding: 60px;
   border-radius: 4px;
   min-height: 80vh;
@@ -85,9 +85,8 @@ main h1 {
   font-family: 'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/* --- Gallery Masonry (CSS ONLY) --- */
+/* --- Gallery Masonry (CSS ONLY - Plus rapide et stable) --- */
 .gallery {
-  /* La magie opère ici : pas de JS, juste des colonnes CSS */
   column-count: 3;
   column-gap: 25px;
   width: 100%;
@@ -95,8 +94,8 @@ main h1 {
 
 .masonry-item {
   display: block;
-  margin-bottom: 25px; /* Espace vertical entre les images */
-  break-inside: avoid; /* Empêche l'image d'être coupée entre deux colonnes */
+  margin-bottom: 25px;
+  break-inside: avoid;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -104,22 +103,23 @@ main h1 {
   transition: transform 0.3s ease;
 }
 
-.masonry-item:hover {
-  transform: translateY(-2px);
+.masonry-item:hover { transform: translateY(-2px); }
+
+/* Conteneur pour l'image (pour l'animation) */
+.masonry-item picture, .masonry-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 
 .masonry-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 8px;
-  /* Optimisation chargement */
-  opacity: 0; 
-  animation: fadeIn 0.6s ease forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 @keyframes fadeIn {
-  to { opacity: 1; }
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* --- About & Contact --- */
@@ -128,8 +128,7 @@ main h1 {
   font-size: 1.1rem;
   line-height: 1.7;
   color: #333;
-  max-width: 800px; /* Pour la lisibilité du texte */
-  margin: 0 auto;
+  width: 100%;
 }
 
 #aboutContent h2, #contactContent h2 {
@@ -144,6 +143,7 @@ main h1 {
   flex-direction: column;
   gap: 15px;
   margin-top: 20px;
+  max-width: 100%;
 }
 
 #contactContent input, #contactContent textarea {
@@ -164,6 +164,8 @@ main h1 {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+  width: auto;
+  align-self: flex-start;
 }
 #contactContent button:hover { background-color: #555; }
 
@@ -214,10 +216,12 @@ main footer {
 @media (max-width: 700px) {
   main { padding: 30px 20px; margin: 20px 10px; }
   main h1 { font-size: 3em; margin-bottom: 40px; line-height: 1.1; }
-  header { padding: 15px 20px; position: relative; } /* Header normal sur mobile pour gagner de la place */
+  header { padding: 15px 20px; }
   header a.navLink { font-size: 18px; }
   
   .gallery { column-count: 1; }
+  
+  #contactContent button { width: 100%; }
 }
 </style>
 </head>
@@ -236,16 +240,95 @@ main footer {
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-item"><img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/chateau_sans.webp" alt="Immagination 3" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/layout_afca02.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/picnic.webp" alt="Picnicmonstre" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/portrait_preview.webp" alt="Portrait 3" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/carnet01.webp" alt="Portrait 1" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/paysage_preview.webp" alt="Paysage 1" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/medicis.webp" alt="Paysage 2" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/donkey_sketchbook3.webp" alt="Paysage 3" loading="lazy"></a>
-    <a class="masonry-item"><img src="images/ettalong_crayon_pastel.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-item" href="images/2D2B_LANDRY_Julien_applat_retake.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/2D2B_LANDRY_Julien_applat_retake_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/2D2B_LANDRY_Julien_applat_retake_800.webp">
+            <source media="(min-width: 400px)" srcset="images/2D2B_LANDRY_Julien_applat_retake_400.webp">
+            <img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/chateau_sans.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/chateau_sans_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/chateau_sans_800.webp">
+            <source media="(min-width: 400px)" srcset="images/chateau_sans_400.webp">
+            <img src="images/chateau_sans.webp" alt="Immagination 3" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/layout_afca02.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/layout_afca02_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/layout_afca02_800.webp">
+            <source media="(min-width: 400px)" srcset="images/layout_afca02_400.webp">
+            <img src="images/layout_afca02.webp" alt="Ettalong - crayon pastel" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/picnic.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/picnic_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/picnic_800.webp">
+            <source media="(min-width: 400px)" srcset="images/picnic_400.webp">
+            <img src="images/picnic.webp" alt="Picnicmonstre" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/portrait_preview.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/portrait_preview_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/portrait_preview_800.webp">
+            <source media="(min-width: 400px)" srcset="images/portrait_preview_400.webp">
+            <img src="images/portrait_preview.webp" alt="Portrait 3" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/carnet01.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/carnet01_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/carnet01_800.webp">
+            <source media="(min-width: 400px)" srcset="images/carnet01_400.webp">
+            <img src="images/carnet01.webp" alt="Portrait 1" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/paysage_preview.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/paysage_preview_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/paysage_preview_800.webp">
+            <source media="(min-width: 400px)" srcset="images/paysage_preview_400.webp">
+            <img src="images/paysage_preview.webp" alt="Paysage 1" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/medicis.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/medicis_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/medicis_800.webp">
+            <source media="(min-width: 400px)" srcset="images/medicis_400.webp">
+            <img src="images/medicis.webp" alt="Paysage 2" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/donkey_sketchbook3.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/donkey_sketchbook3_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/donkey_sketchbook3_800.webp">
+            <source media="(min-width: 400px)" srcset="images/donkey_sketchbook3_400.webp">
+            <img src="images/donkey_sketchbook3.webp" alt="Paysage 3" loading="lazy" decoding="async">
+        </picture>
+    </a>
+    
+    <a class="masonry-item" href="images/ettalong_crayon_pastel.webp">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/ettalong_crayon_pastel_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/ettalong_crayon_pastel_800.webp">
+            <source media="(min-width: 400px)" srcset="images/ettalong_crayon_pastel_400.webp">
+            <img src="images/ettalong_crayon_pastel.webp" alt="Ettalong - crayon pastel" loading="lazy" decoding="async">
+        </picture>
+    </a>
   </div>
 
   <div id="aboutContent">
@@ -292,14 +375,12 @@ main footer {
 
   /* --- Navigation Simple --- */
   function showSection(sectionToShow){
-    // On cache tout d'abord
     galleryEl.style.display = 'none';
     aboutContent.style.display = 'none';
     contactContent.style.display = 'none';
     
-    // On affiche la section demandée (ou la galerie via flex/block selon CSS, ici display original est suffisant car masonry est CSS)
     if(sectionToShow === galleryEl) {
-        sectionToShow.style.display = 'block'; // Block pour column-count
+        sectionToShow.style.display = 'block'; 
     } else {
         sectionToShow.style.display = 'block';
     }
@@ -311,22 +392,21 @@ main footer {
   contactBtn.addEventListener('click', () => showSection(contactContent));
   homeBtn.addEventListener('click', () => showSection(galleryEl));
 
-  /* --- Lightbox --- */
+  /* --- Lightbox (Zoom) --- */
   galleryEl.addEventListener('click', e => {
-    // On cherche le lien parent ou l'image cliquée
-    const imgClicked = e.target.closest('img');
+    // Cherche le lien parent qui contient l'URL de la pleine résolution
     const linkClicked = e.target.closest('a.masonry-item');
     
-    if(!linkClicked || !imgClicked) return;
+    if(!linkClicked) return;
     
-    e.preventDefault(); // Empêcher le comportement par défaut
+    e.preventDefault(); 
     
-    const src = imgClicked.src;
-    if(!src) return;
+    // Le lien href contient l'URL de l'image de base (pleine résolution/sans suffixe de taille)
+    const fullResSrc = linkClicked.getAttribute('href'); 
+    if(!fullResSrc) return;
     
-    lightboxImg.src = src;
+    lightboxImg.src = fullResSrc;
     lightbox.style.display = 'flex';
-    // Petit délai pour permettre l'animation CSS (fade in)
     requestAnimationFrame(() => lightbox.classList.add('show'));
   });
   
@@ -335,7 +415,7 @@ main footer {
     setTimeout(() => {
       lightbox.style.display = 'none';
       lightboxImg.src = '';
-    }, 300); // Correspond à la durée de transition CSS
+    }, 300);
   }
 
   lightbox.addEventListener('click', closeLightbox);
