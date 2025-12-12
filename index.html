@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" type="image/png" href="images/caca.webp">
 <title>Julien Landry – Dessin & Peinture</title>
+<link rel="preload" href="riccione-serial-xlight.ttf" as="font" type="font/ttf" crossorigin>
 <style>
 /* --- Reset / Base --- */
 * { box-sizing: border-box; margin:0; padding:0; }
@@ -19,6 +20,7 @@ body {
 @font-face {
   font-family: 'Riccione Serial XLight';
   src: url('riccione-serial-xlight.ttf') format('truetype');
+  font-display: swap;
 }
 
 /* --- Header --- */
@@ -105,11 +107,23 @@ main h1 {
   cursor: pointer;
   text-decoration: none;
   background: #f2f2f2;
+  position: relative;
+}
+
+.masonry-item::before {
+  content: '';
+  display: block;
+  padding-bottom: 66%;
+  background: linear-gradient(135deg, #f2f2f2 0%, #e8e8e8 100%);
 }
 
 .masonry-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
   border-radius: 8px;
   filter: blur(18px);
@@ -132,7 +146,7 @@ main h1 {
   color: #333;
 }
 
-#aboutContent h2 {
+#aboutContent h2, #contactContent h2 {
   font-size: 2em;
   margin-bottom: 50px;
   text-align: center;
@@ -231,16 +245,16 @@ main footer {
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/chateau_sans.webp" alt="Immagination 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/layout_afca02.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/picnic.webp" alt="Picnicmonstre" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/portrait_preview.webp" alt="Portrait 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/carnet01.webp" alt="Portrait 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/paysage_preview.webp" alt="Paysage 1" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/medicis.webp" alt="Paysage 2" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.webp" alt="Paysage 3" loading="lazy"></a>
-    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#" data-src="images/2D2B_LANDRY_Julien_applat_retake.webp" data-alt="Immagination 1"></a>
+    <a class="masonry-src" href="#" data-src="images/chateau_sans.webp" data-alt="Immagination 3"></a>
+    <a class="masonry-src" href="#" data-src="images/layout_afca02.webp" data-alt="Ettalong - crayon pastel"></a>
+    <a class="masonry-src" href="#" data-src="images/picnic.webp" data-alt="Picnicmonstre"></a>
+    <a class="masonry-src" href="#" data-src="images/portrait_preview.webp" data-alt="Portrait 3"></a>
+    <a class="masonry-src" href="#" data-src="images/carnet01.webp" data-alt="Portrait 1"></a>
+    <a class="masonry-src" href="#" data-src="images/paysage_preview.webp" data-alt="Paysage 1"></a>
+    <a class="masonry-src" href="#" data-src="images/medicis.webp" data-alt="Paysage 2"></a>
+    <a class="masonry-src" href="#" data-src="images/donkey_sketchbook3.webp" data-alt="Paysage 3"></a>
+    <a class="masonry-src" href="#" data-src="images/ettalong_crayon_pastel.webp" data-alt="Ettalong - crayon pastel"></a>
   </div>
 
   <div id="aboutContent">
@@ -248,9 +262,9 @@ main footer {
     <p>
       Bonjour !<br><br>
       Je suis peintre, dessinateur, illustrateur et animateur de 20 ans, actuellement en train de terminer mon bachelor en animation à LISAA.<br><br>
-      Ce qui me passionne, c’est aussi bien le réel (paysages, natures mortes, modèles vivants) que le monde de l’imagination.<br><br>
-      Je maîtrise plusieurs médiums traditionnels tels que le pastel sec et gras, l’acrylique, l’aquarelle, la gouache et l’encre… ainsi que les outils numériques Photoshop et Harmony.<br><br><br><br>
-      Email : <a>landryjulien47@gmail.com</a>
+      Ce qui me passionne, c'est aussi bien le réel (paysages, natures mortes, modèles vivants) que le monde de l'imagination.<br><br>
+      Je maîtrise plusieurs médiums traditionnels tels que le pastel sec et gras, l'acrylique, l'aquarelle, la gouache et l'encre… ainsi que les outils numériques Photoshop et Harmony.<br><br><br><br>
+      Email : <a href="mailto:landryjulien47@gmail.com">landryjulien47@gmail.com</a>
     </p>
   </div>
 
@@ -286,38 +300,39 @@ main footer {
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
 
   /* --- Masonry layout --- */
-  function placeholderSvg(width){
-    const w = Math.max(10, Math.round(width||16));
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-  }
-
   function getColCount(containerWidth){
     return (containerWidth <= 700) ? 1 : 3;
   }
 
   let currentCols=[];
   function buildColumns(){
+    const oldScroll = mainIsland.scrollTop;
     galleryEl.innerHTML='';
     currentCols=[];
     const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
     const cols = getColCount(containerWidth);
+    
     for(let i=0;i<cols;i++){
       const col=document.createElement('div');
       col.className='masonry-col';
       galleryEl.appendChild(col);
       currentCols.push(col);
     }
+    
     sourceAnchors.forEach(srcAnchor=>{
       const newA=document.createElement('a');
       newA.className='masonry-item';
-      newA.href=srcAnchor.getAttribute('href')||'#';
-      const img=srcAnchor.querySelector('img').cloneNode(true);
-      const originalSrc=img.getAttribute('src')||'';
+      newA.href='#';
+      
+      const img=document.createElement('img');
+      const originalSrc=srcAnchor.getAttribute('data-src');
+      const alt=srcAnchor.getAttribute('data-alt')||'';
+      
       img.setAttribute('data-src', originalSrc);
-      img.src=placeholderSvg(16);
+      img.alt=alt;
       img.loading='lazy';
       img.decoding='async';
+      
       newA.appendChild(img);
 
       let targetCol=currentCols[0];
@@ -330,25 +345,34 @@ main footer {
       }
       targetCol.appendChild(newA);
     });
+    
+    mainIsland.scrollTop = oldScroll;
   }
 
   /* --- Lazy loading --- */
   let io=null;
   function setupLazyObserver(){
     if(io) io.disconnect();
-    io=new IntersectionObserver((entries,obs)=>{
+    io=new IntersectionObserver((entries)=>{
       entries.forEach(entry=>{
         if(!entry.isIntersecting) return;
         const img=entry.target;
         const full=img.getAttribute('data-src');
-        if(full){
+        if(full && !img.src){
           img.src=full;
-          img.onload=()=>{img.classList.add('loaded'); img.removeAttribute('data-src');};
-          img.onerror=()=>img.removeAttribute('data-src');
+          img.onload=()=>{
+            img.classList.add('loaded');
+            img.removeAttribute('data-src');
+          };
+          img.onerror=()=>{
+            console.error('Failed to load:', full);
+            img.removeAttribute('data-src');
+          };
         }
-        obs.unobserve(img);
+        io.unobserve(img);
       });
-    }, {root:null, rootMargin:'250px 0px', threshold:0.01});
+    }, {root:null, rootMargin:'400px 0px', threshold:0.01});
+    
     galleryEl.querySelectorAll('img[data-src]').forEach(img=>io.observe(img));
   }
 
@@ -359,19 +383,29 @@ main footer {
       if(!a) return;
       e.preventDefault();
       const img=a.querySelector('img');
-      const src=img.src && !img.hasAttribute('data-src') ? img.src : img.getAttribute('data-src')||img.src;
+      const src=img.src || img.getAttribute('data-src');
+      if(!src) return;
+      
       lightboxImg.src=src;
       lightbox.style.display='flex';
       requestAnimationFrame(()=>lightbox.classList.add('show'));
     });
+    
     lightbox.addEventListener('click', ()=>{
       lightbox.classList.remove('show');
-      setTimeout(()=>{lightbox.style.display='none'; lightboxImg.src='';},250);
+      setTimeout(()=>{
+        lightbox.style.display='none';
+        lightboxImg.src='';
+      },250);
     });
-    window.addEventListener('keydown', ev=>{
+    
+    document.addEventListener('keydown', ev=>{
       if(ev.key==='Escape' && lightbox.classList.contains('show')){
         lightbox.classList.remove('show');
-        setTimeout(()=>{lightbox.style.display='none'; lightboxImg.src='';},250);
+        setTimeout(()=>{
+          lightbox.style.display='none';
+          lightboxImg.src='';
+        },250);
       }
     });
   }
@@ -397,8 +431,14 @@ main footer {
   });
 
   /* --- Resize debounce --- */
-  function debounce(fn,wait=150){ let t=null; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
-  window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); },150));
+  let resizeTimer=null;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(()=>{
+      buildColumns();
+      setupLazyObserver();
+    }, 150);
+  });
 
   /* --- Init --- */
   buildColumns();
