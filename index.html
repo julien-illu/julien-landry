@@ -107,17 +107,31 @@ main h1 {
   cursor: pointer;
   text-decoration: none;
   background: #f2f2f2;
+  position: relative;
+}
+
+.masonry-item-inner {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(135deg, #f2f2f2 0%, #e8e8e8 100%);
 }
 
 .masonry-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
   border-radius: 8px;
-  filter: blur(18px);
-  transform: scale(1.03);
   transition: filter 0.6s ease, transform 0.6s ease, opacity 0.4s ease;
-  opacity: 0.95;
+}
+
+.masonry-item img.thumb {
+  filter: blur(8px);
+  transform: scale(1.02);
+  opacity: 0.9;
 }
 
 .masonry-item img.loaded {
@@ -233,16 +247,16 @@ main footer {
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-src" href="#" data-src="images/2D2B_LANDRY_Julien_applat_retake.webp" data-alt="Immagination 1"></a>
-    <a class="masonry-src" href="#" data-src="images/chateau_sans.webp" data-alt="Immagination 3"></a>
-    <a class="masonry-src" href="#" data-src="images/layout_afca02.webp" data-alt="Ettalong - crayon pastel"></a>
-    <a class="masonry-src" href="#" data-src="images/picnic.webp" data-alt="Picnicmonstre"></a>
-    <a class="masonry-src" href="#" data-src="images/portrait_preview.webp" data-alt="Portrait 3"></a>
-    <a class="masonry-src" href="#" data-src="images/carnet01.webp" data-alt="Portrait 1"></a>
-    <a class="masonry-src" href="#" data-src="images/paysage_preview.webp" data-alt="Paysage 1"></a>
-    <a class="masonry-src" href="#" data-src="images/medicis.webp" data-alt="Paysage 2"></a>
-    <a class="masonry-src" href="#" data-src="images/donkey_sketchbook3.webp" data-alt="Paysage 3"></a>
-    <a class="masonry-src" href="#" data-src="images/ettalong_crayon_pastel.webp" data-alt="Ettalong - crayon pastel"></a>
+    <a class="masonry-src" href="#" data-src="images/2D2B_LANDRY_Julien_applat_retake.webp" data-width="1200" data-height="1600" data-alt="Immagination 1"></a>
+    <a class="masonry-src" href="#" data-src="images/chateau_sans.webp" data-width="1600" data-height="1200" data-alt="Immagination 3"></a>
+    <a class="masonry-src" href="#" data-src="images/layout_afca02.webp" data-width="1400" data-height="1000" data-alt="Ettalong - crayon pastel"></a>
+    <a class="masonry-src" href="#" data-src="images/picnic.webp" data-width="1600" data-height="1200" data-alt="Picnicmonstre"></a>
+    <a class="masonry-src" href="#" data-src="images/portrait_preview.webp" data-width="1200" data-height="1600" data-alt="Portrait 3"></a>
+    <a class="masonry-src" href="#" data-src="images/carnet01.webp" data-width="1400" data-height="1800" data-alt="Portrait 1"></a>
+    <a class="masonry-src" href="#" data-src="images/paysage_preview.webp" data-width="1600" data-height="1200" data-alt="Paysage 1"></a>
+    <a class="masonry-src" href="#" data-src="images/medicis.webp" data-width="1400" data-height="1000" data-alt="Paysage 2"></a>
+    <a class="masonry-src" href="#" data-src="images/donkey_sketchbook3.webp" data-width="1200" data-height="1600" data-alt="Paysage 3"></a>
+    <a class="masonry-src" href="#" data-src="images/ettalong_crayon_pastel.webp" data-width="1600" data-height="1200" data-alt="Ettalong - crayon pastel"></a>
   </div>
 
   <div id="aboutContent">
@@ -287,9 +301,22 @@ main footer {
   const contactContent = document.getElementById('contactContent');
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
 
+  /* --- Generate thumbnail URL --- */
+  function getThumbnailUrl(originalUrl, targetWidth) {
+    // For actual implementation, you would create thumbnail versions of your images
+    // For now, we'll use the original but with URL parameters that your server could use
+    // Example: images/photo.webp?w=400
+    return originalUrl + '?w=' + targetWidth;
+  }
+
   /* --- Masonry layout --- */
   function getColCount(containerWidth){
     return (containerWidth <= 700) ? 1 : 3;
+  }
+
+  function getColWidth(containerWidth, cols) {
+    const gap = 25;
+    return (containerWidth - (gap * (cols - 1))) / cols;
   }
 
   let currentCols=[];
@@ -299,6 +326,7 @@ main footer {
     currentCols=[];
     const containerWidth = galleryEl.clientWidth || document.documentElement.clientWidth;
     const cols = getColCount(containerWidth);
+    const colWidth = getColWidth(containerWidth, cols);
     
     for(let i=0;i<cols;i++){
       const col=document.createElement('div');
@@ -312,16 +340,28 @@ main footer {
       newA.className='masonry-item';
       newA.href='#';
       
-      const img=document.createElement('img');
       const originalSrc=srcAnchor.getAttribute('data-src');
       const alt=srcAnchor.getAttribute('data-alt')||'';
+      const width=parseInt(srcAnchor.getAttribute('data-width')||'1600');
+      const height=parseInt(srcAnchor.getAttribute('data-height')||'1200');
       
-      img.setAttribute('data-src', originalSrc);
-      img.alt=alt;
-      img.loading='lazy';
-      img.decoding='async';
+      // Calculate aspect ratio and create container with correct height
+      const aspectRatio = height / width;
+      const inner = document.createElement('div');
+      inner.className = 'masonry-item-inner';
+      inner.style.paddingBottom = (aspectRatio * 100) + '%';
       
-      newA.appendChild(img);
+      // Create thumbnail image (loads immediately for visible images)
+      const thumbImg = document.createElement('img');
+      thumbImg.className = 'thumb';
+      thumbImg.alt = alt;
+      thumbImg.setAttribute('data-full', originalSrc);
+      thumbImg.src = getThumbnailUrl(originalSrc, Math.round(colWidth));
+      thumbImg.loading = 'lazy';
+      thumbImg.decoding = 'async';
+      
+      inner.appendChild(thumbImg);
+      newA.appendChild(inner);
 
       let targetCol=currentCols[0];
       let minHeight=targetCol.offsetHeight;
@@ -337,33 +377,38 @@ main footer {
     mainIsland.scrollTop = oldScroll;
   }
 
-  /* --- Lazy loading --- */
+  /* --- Progressive loading: thumb -> full resolution --- */
   let io=null;
-  function setupLazyObserver(){
+  function setupProgressiveLoading(){
     if(io) io.disconnect();
+    
     io=new IntersectionObserver((entries)=>{
       entries.forEach(entry=>{
         if(!entry.isIntersecting) return;
         const img=entry.target;
-        const full=img.getAttribute('data-src');
-        if(full && !img.src){
-          const tempImg = new Image();
-          tempImg.onload=()=>{
-            img.src=tempImg.src;
+        const fullSrc=img.getAttribute('data-full');
+        
+        if(fullSrc && img.classList.contains('thumb')){
+          // Load full resolution in background
+          const fullImg = new Image();
+          fullImg.onload=()=>{
+            img.src=fullImg.src;
+            img.classList.remove('thumb');
             img.classList.add('loaded');
-            img.removeAttribute('data-src');
+            img.removeAttribute('data-full');
           };
-          tempImg.onerror=()=>{
-            console.error('Failed to load:', full);
-            img.removeAttribute('data-src');
+          fullImg.onerror=()=>{
+            console.error('Failed to load full resolution:', fullSrc);
+            img.classList.add('loaded'); // Still show thumbnail
+            img.removeAttribute('data-full');
           };
-          tempImg.src=full;
+          fullImg.src=fullSrc;
         }
         io.unobserve(img);
       });
-    }, {root:null, rootMargin:'400px 0px', threshold:0.01});
+    }, {root:null, rootMargin:'200px 0px', threshold:0.01});
     
-    galleryEl.querySelectorAll('img[data-src]').forEach(img=>io.observe(img));
+    galleryEl.querySelectorAll('img[data-full]').forEach(img=>io.observe(img));
   }
 
   /* --- Lightbox --- */
@@ -373,7 +418,7 @@ main footer {
       if(!a) return;
       e.preventDefault();
       const img=a.querySelector('img');
-      const src=img.src || img.getAttribute('data-src');
+      const src=img.getAttribute('data-full') || img.src;
       if(!src) return;
       
       lightboxImg.src=src;
@@ -416,7 +461,7 @@ main footer {
     contactContent.style.display='none';
     galleryEl.style.display='flex';
     buildColumns();
-    setupLazyObserver();
+    setupProgressiveLoading();
     mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   });
 
@@ -426,13 +471,13 @@ main footer {
     clearTimeout(resizeTimer);
     resizeTimer=setTimeout(()=>{
       buildColumns();
-      setupLazyObserver();
+      setupProgressiveLoading();
     }, 150);
   });
 
   /* --- Init --- */
   buildColumns();
-  setupLazyObserver();
+  setupProgressiveLoading();
   setupLightbox();
 })();
 </script>
