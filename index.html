@@ -231,51 +231,16 @@ main footer {
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-src" href="#">
-      <img 
-        src="images/2D2B_LANDRY_Julien_applat_retake-480.webp"
-        srcset="
-          images/2D2B_LANDRY_Julien_applat_retake-480.webp 480w,
-          images/2D2B_LANDRY_Julien_applat_retake-768.webp 768w,
-          images/2D2B_LANDRY_Julien_applat_retake-1200.webp 1200w,
-          images/2D2B_LANDRY_Julien_applat_retake.webp 1920w
-        "
-        sizes="(max-width: 700px) 90vw, 33vw"
-        alt="Immagination 1"
-        loading="lazy">
-    </a>
-
-    <a class="masonry-src" href="#">
-      <img 
-        src="images/chateau_sans-480.webp"
-        srcset="
-          images/chateau_sans-480.webp 480w,
-          images/chateau_sans-768.webp 768w,
-          images/chateau_sans-1200.webp 1200w,
-          images/chateau_sans.webp 1920w
-        "
-        sizes="(max-width: 700px) 90vw, 33vw"
-        alt="Immagination 3"
-        loading="lazy">
-    </a>
-
-    <!-- Répéter pour toutes les autres images avec le même format -->
-    <!-- Exemple pour layout_afca02 -->
-    <a class="masonry-src" href="#">
-      <img
-        src="images/layout_afca02-480.webp"
-        srcset="
-          images/layout_afca02-480.webp 480w,
-          images/layout_afca02-768.webp 768w,
-          images/layout_afca02-1200.webp 1200w,
-          images/layout_afca02.webp 1920w
-        "
-        sizes="(max-width: 700px) 90vw, 33vw"
-        alt="Ettalong - crayon pastel"
-        loading="lazy">
-    </a>
-
-    <!-- Copier le même modèle pour picnic, portrait_preview, carnet01, paysage_preview, medicis, donkey_sketchbook3, ettalong_crayon_pastel -->
+    <a class="masonry-src" href="#"><img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/chateau_sans.webp" alt="Immagination 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/layout_afca02.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/picnic.webp" alt="Picnicmonstre" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/portrait_preview.webp" alt="Portrait 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/carnet01.webp" alt="Portrait 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/paysage_preview.webp" alt="Paysage 1" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/medicis.webp" alt="Paysage 2" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/donkey_sketchbook3.webp" alt="Paysage 3" loading="lazy"></a>
+    <a class="masonry-src" href="#"><img src="images/ettalong_crayon_pastel.webp" alt="Ettalong - crayon pastel" loading="lazy"></a>
   </div>
 
   <div id="aboutContent">
@@ -320,6 +285,7 @@ main footer {
   const contactContent = document.getElementById('contactContent');
   const sourceAnchors = Array.from(galleryEl.querySelectorAll('a.masonry-src'));
 
+  /* --- Masonry layout --- */
   function placeholderSvg(width){
     const w = Math.max(10, Math.round(width||16));
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${Math.round(w*0.66)}'><rect width='100%' height='100%' fill='#eee'/></svg>`;
@@ -366,6 +332,7 @@ main footer {
     });
   }
 
+  /* --- Lazy loading --- */
   let io=null;
   function setupLazyObserver(){
     if(io) io.disconnect();
@@ -385,6 +352,7 @@ main footer {
     galleryEl.querySelectorAll('img[data-src]').forEach(img=>io.observe(img));
   }
 
+  /* --- Lightbox --- */
   function setupLightbox(){
     galleryEl.addEventListener('click', e=>{
       const a=e.target.closest('a.masonry-item');
@@ -408,6 +376,7 @@ main footer {
     });
   }
 
+  /* --- Section navigation --- */
   function showSection(section){
     galleryEl.style.display='none';
     aboutContent.style.display='none';
@@ -427,9 +396,11 @@ main footer {
     mainIsland.scrollTo({ top: 0, behavior: 'auto' });
   });
 
+  /* --- Resize debounce --- */
   function debounce(fn,wait=150){ let t=null; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
   window.addEventListener('resize', debounce(()=>{ buildColumns(); setupLazyObserver(); },150));
 
+  /* --- Init --- */
   buildColumns();
   setupLazyObserver();
   setupLightbox();
