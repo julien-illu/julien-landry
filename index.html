@@ -107,23 +107,11 @@ main h1 {
   cursor: pointer;
   text-decoration: none;
   background: #f2f2f2;
-  position: relative;
-}
-
-.masonry-item::before {
-  content: '';
-  display: block;
-  padding-bottom: 66%;
-  background: linear-gradient(135deg, #f2f2f2 0%, #e8e8e8 100%);
 }
 
 .masonry-item img {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
   display: block;
   border-radius: 8px;
   filter: blur(18px);
@@ -359,15 +347,17 @@ main footer {
         const img=entry.target;
         const full=img.getAttribute('data-src');
         if(full && !img.src){
-          img.src=full;
-          img.onload=()=>{
+          const tempImg = new Image();
+          tempImg.onload=()=>{
+            img.src=tempImg.src;
             img.classList.add('loaded');
             img.removeAttribute('data-src');
           };
-          img.onerror=()=>{
+          tempImg.onerror=()=>{
             console.error('Failed to load:', full);
             img.removeAttribute('data-src');
           };
+          tempImg.src=full;
         }
         io.unobserve(img);
       });
