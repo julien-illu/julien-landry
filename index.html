@@ -84,7 +84,7 @@ main h1 {
   font-family: 'Riccione Serial XLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/* --- Gallery Masonry (CSS ONLY - Plus rapide et stable) --- */
+/* --- Gallery Masonry --- */
 .gallery {
   column-count: 3;
   column-gap: 25px;
@@ -104,7 +104,6 @@ main h1 {
 
 .masonry-item:hover { transform: translateY(-2px); }
 
-/* Conteneur pour l'image (pour l'animation) */
 .masonry-item picture, .masonry-item img {
   display: block;
   width: 100%;
@@ -186,13 +185,25 @@ main footer {
 .lightbox {
   position: fixed;
   top:0; left:0; right:0; bottom:0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   display: none;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   z-index: 2000;
   padding: 20px;
   backdrop-filter: blur(5px);
+  cursor: pointer;
+}
+
+.lightbox-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; 
 }
 
 .lightbox img {
@@ -202,14 +213,77 @@ main footer {
   box-shadow: 0 4px 25px rgba(0,0,0,0.7);
   opacity: 0;
   transform: scale(0.95);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease; 
+  cursor: zoom-in;
+  /* Important pour éviter que l'image ne glisse bizarrement */
+  user-select: none; 
+  -webkit-user-drag: none;
 }
 
 .lightbox.show img { opacity: 1; transform: scale(1); }
 
+/* État Zoomé */
+.lightbox img.zoomed {
+  cursor: grab; /* Curseur main ouverte */
+  z-index: 2020;
+}
+
+/* État en déplacement */
+.lightbox img.zoomed.grabbing {
+  cursor: grabbing; /* Curseur main fermée */
+  transition: none; /* Désactive la transition pour un mouvement fluide */
+}
+
+.lightbox-caption {
+  color: #fff;
+  font-size: 1.2rem;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 4px;
+  text-align: center;
+  max-width: 90%;
+  cursor: default;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 3rem;
+  background: rgba(0,0,0,0.3);
+  padding: 10px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+  z-index: 2010;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.lightbox-nav:hover { background: rgba(0,0,0,0.6); }
+
+#prevBtn { left: 10px; }
+#nextBtn { right: 10px; }
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: #fff;
+  cursor: pointer;
+  z-index: 2030;
+  line-height: 0.5;
+  transition: color 0.2s;
+}
+.lightbox-close:hover { color: #ccc; }
+
 /* --- Mobile Layout --- */
 @media (max-width: 900px) {
     .gallery { column-count: 2; }
+    .lightbox-nav { font-size: 2rem; padding: 5px 10px; }
 }
 
 @media (max-width: 700px) {
@@ -217,20 +291,20 @@ main footer {
   main h1 { font-size: 3em; margin-bottom: 40px; line-height: 1.1; }
   header { padding: 15px 20px; }
   header a.navLink { font-size: 18px; }
-  
   .gallery { column-count: 1; }
-  
   #contactContent button { width: 100%; }
+  .lightbox-caption { font-size: 1rem; }
+  .lightbox-close { top: 15px; right: 15px; font-size: 35px; }
 }
 </style>
 </head>
 <body>
 
 <header>
-  <a class="homeBtn" id="homeBtn">HOME</a>
+  <a class="homeBtn" href="#home">HOME</a>
   <div class="navLinks">
-    <a class="navLink" id="aboutBtn">About</a>
-    <a class="navLink" id="contactBtn">Contact</a>
+    <a class="navLink" href="#about">About</a>
+    <a class="navLink" href="#contact">Contact</a>
     <a class="navLink" href="https://www.instagram.com/julienprimante/" target="_blank" rel="noopener noreferrer">Instagram</a>
   </div>
 </header>
@@ -239,7 +313,16 @@ main footer {
   <h1>Julien Landry</h1>
 
   <div class="gallery" id="gallery">
-    <a class="masonry-item" href="images/2D2B_LANDRY_Julien_applat_retake.webp">
+    <a class="masonry-item" href="images/ARTHAE_layout_s50_v01.webp" data-alt="Immagination 1">
+        <picture>
+            <source media="(min-width: 1200px)" srcset="images/ARTHAE_layout_s50_v01_1200.webp">
+            <source media="(min-width: 800px)" srcset="images/ARTHAE_layout_s50_v01_800.webp">
+            <source media="(min-width: 400px)" srcset="images/ARTHAE_layout_s50_v01_400.webp">
+            <img src="images/2D2B_LANDRY_Julien_applat_retake.webp" alt="Immagination 1" loading="lazy" decoding="async">
+        </picture>
+    </a>
+
+    <a class="masonry-item" href="images/2D2B_LANDRY_Julien_applat_retake.webp" data-alt="Immagination 1">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/2D2B_LANDRY_Julien_applat_retake_1200.webp">
             <source media="(min-width: 800px)" srcset="images/2D2B_LANDRY_Julien_applat_retake_800.webp">
@@ -248,7 +331,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/chateau_sans.webp">
+    <a class="masonry-item" href="images/chateau_sans.webp" data-alt="Immagination 3">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/chateau_sans_1200.webp">
             <source media="(min-width: 800px)" srcset="images/chateau_sans_800.webp">
@@ -257,7 +340,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/layout_afca02.webp">
+    <a class="masonry-item" href="images/layout_afca02.webp" data-alt="Ettalong - crayon pastel">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/layout_afca02_1200.webp">
             <source media="(min-width: 800px)" srcset="images/layout_afca02_800.webp">
@@ -266,7 +349,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/picnic.webp">
+    <a class="masonry-item" href="images/picnic.webp" data-alt="Picnicmonstre">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/picnic_1200.webp">
             <source media="(min-width: 800px)" srcset="images/picnic_800.webp">
@@ -275,7 +358,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/portrait_preview.webp">
+    <a class="masonry-item" href="images/portrait_preview.webp" data-alt="Portrait 3">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/portrait_preview_1200.webp">
             <source media="(min-width: 800px)" srcset="images/portrait_preview_800.webp">
@@ -284,7 +367,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/carnet01.webp">
+    <a class="masonry-item" href="images/carnet01.webp" data-alt="Portrait 1">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/carnet01_1200.webp">
             <source media="(min-width: 800px)" srcset="images/carnet01_800.webp">
@@ -293,7 +376,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/paysage_preview.webp">
+    <a class="masonry-item" href="images/paysage_preview.webp" data-alt="Paysage 1">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/paysage_preview_1200.webp">
             <source media="(min-width: 800px)" srcset="images/paysage_preview_800.webp">
@@ -302,7 +385,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/medicis.webp">
+    <a class="masonry-item" href="images/medicis.webp" data-alt="Paysage 2">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/medicis_1200.webp">
             <source media="(min-width: 800px)" srcset="images/medicis_800.webp">
@@ -311,7 +394,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/donkey_sketchbook3.webp">
+    <a class="masonry-item" href="images/donkey_sketchbook3.webp" data-alt="Paysage 3">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/donkey_sketchbook3_1200.webp">
             <source media="(min-width: 800px)" srcset="images/donkey_sketchbook3_800.webp">
@@ -320,7 +403,7 @@ main footer {
         </picture>
     </a>
     
-    <a class="masonry-item" href="images/ettalong_crayon_pastel.webp">
+    <a class="masonry-item" href="images/ettalong_crayon_pastel.webp" data-alt="Ettalong - crayon pastel">
         <picture>
             <source media="(min-width: 1200px)" srcset="images/ettalong_crayon_pastel_1200.webp">
             <source media="(min-width: 800px)" srcset="images/ettalong_crayon_pastel_800.webp">
@@ -331,6 +414,7 @@ main footer {
   </div>
 
   <div id="aboutContent">
+    <a name="about"></a>
     <h2>À propos</h2>
     <p>
       Bonjour !<br><br>
@@ -342,6 +426,7 @@ main footer {
   </div>
 
   <div id="contactContent">
+    <a name="contact"></a>
     <h2>Contact</h2>
     <p>Pour toute question ou commande :</p>
     <form action="https://formspree.io/f/mblaqyvy" method="POST">
@@ -356,7 +441,14 @@ main footer {
 </main>
 
 <div class="lightbox" id="lightbox">
-  <img src="" alt="Agrandissement">
+  <div class="lightbox-close" id="closeBtn">&times;</div>
+  
+  <div class="lightbox-content">
+      <div class="lightbox-nav" id="prevBtn">&lt;</div>
+      <img src="" alt="Agrandissement">
+      <div class="lightbox-nav" id="nextBtn">&gt;</div>
+  </div>
+  <div class="lightbox-caption" id="caption"></div>
 </div>
 
 <script>
@@ -364,64 +456,190 @@ main footer {
   const galleryEl = document.getElementById('gallery');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = lightbox.querySelector('img');
+  const captionEl = document.getElementById('caption');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const closeBtn = document.getElementById('closeBtn');
   
-  const aboutBtn = document.getElementById('aboutBtn');
-  const contactBtn = document.getElementById('contactBtn');
-  const homeBtn = document.getElementById('homeBtn');
-  
+  const links = Array.from(document.querySelectorAll('a.masonry-item'));
+  let currentIndex = -1;
+
   const aboutContent = document.getElementById('aboutContent');
   const contactContent = document.getElementById('contactContent');
 
-  /* --- Navigation Simple --- */
-  function showSection(sectionToShow){
+  /* --- Navigation & Hash --- */
+  function showSection(hash) {
+    const id = hash.replace('#', '');
     galleryEl.style.display = 'none';
     aboutContent.style.display = 'none';
     contactContent.style.display = 'none';
-    
-    if(sectionToShow === galleryEl) {
-        sectionToShow.style.display = 'block'; 
+
+    if (id === 'about') {
+        aboutContent.style.display = 'block';
+    } else if (id === 'contact') {
+        contactContent.style.display = 'block';
     } else {
-        sectionToShow.style.display = 'block';
+        galleryEl.style.display = 'block';
     }
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  aboutBtn.addEventListener('click', () => showSection(aboutContent));
-  contactBtn.addEventListener('click', () => showSection(contactContent));
-  homeBtn.addEventListener('click', () => showSection(galleryEl));
+  document.querySelectorAll('header a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            e.preventDefault();
+            history.pushState(null, null, href);
+            showSection(href);
+        }
+    });
+  });
 
-  /* --- Lightbox (Zoom) --- */
+  window.addEventListener('popstate', () => showSection(window.location.hash));
+  window.addEventListener('DOMContentLoaded', () => showSection(window.location.hash));
+
+  /* --- Lightbox Logic --- */
+  
+  // Variables pour le Drag & Drop
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let translateX = 0, translateY = 0;
+  let hasMoved = false; // Pour distinguer un clic d'un glisser
+
+  function updateLightbox(index) {
+    if (index >= 0 && index < links.length) {
+      currentIndex = index;
+      const link = links[currentIndex];
+      const fullResSrc = link.getAttribute('href');
+      const altText = link.getAttribute('data-alt') || link.querySelector('img').alt;
+
+      // Reset total quand on change d'image
+      resetZoomState();
+
+      const tempImg = new Image();
+      tempImg.onload = () => {
+        lightboxImg.src = fullResSrc;
+        captionEl.textContent = altText;
+        prevBtn.style.display = (currentIndex === 0) ? 'none' : 'block';
+        nextBtn.style.display = (currentIndex === links.length - 1) ? 'none' : 'block';
+
+        if (!lightbox.classList.contains('show')) {
+          lightbox.style.display = 'flex';
+          requestAnimationFrame(() => lightbox.classList.add('show'));
+        }
+      };
+      tempImg.src = fullResSrc;
+    }
+  }
+
+  function resetZoomState() {
+      lightboxImg.classList.remove('zoomed', 'grabbing');
+      lightboxImg.style.transform = '';
+      translateX = 0;
+      translateY = 0;
+  }
+  
+  // Ouverture
   galleryEl.addEventListener('click', e => {
-    // Cherche le lien parent qui contient l'URL de la pleine résolution
-    const linkClicked = e.target.closest('a.masonry-item');
-    
-    if(!linkClicked) return;
-    
     e.preventDefault(); 
-    
-    // Le lien href contient l'URL de l'image de base (pleine résolution/sans suffixe de taille)
-    const fullResSrc = linkClicked.getAttribute('href'); 
-    if(!fullResSrc) return;
-    
-    lightboxImg.src = fullResSrc;
-    lightbox.style.display = 'flex';
-    requestAnimationFrame(() => lightbox.classList.add('show'));
+    const linkClicked = e.target.closest('a.masonry-item');
+    if(!linkClicked) return;
+    const index = links.indexOf(linkClicked);
+    updateLightbox(index);
   });
   
-  function closeLightbox(){
+  // Navigation Flèches
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex - 1); });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex + 1); });
+  
+  // Fermeture
+  function closeLightbox(e){
+    // Vérifie si l'événement est un clic sur l'image ou la légende, et dans ce cas, n'opère pas.
+    if (e && (e.target === lightboxImg || e.target === captionEl)) return;
     lightbox.classList.remove('show');
+    
+    // Attendre la fin de l'anim fade out pour reset
     setTimeout(() => {
       lightbox.style.display = 'none';
       lightboxImg.src = '';
+      captionEl.textContent = '';
+      currentIndex = -1;
+      resetZoomState();
     }, 300);
   }
 
-  lightbox.addEventListener('click', closeLightbox);
-  
+  lightbox.addEventListener('click', closeLightbox); 
+  closeBtn.addEventListener('click', closeLightbox); 
+
+  /* --- Gestion du Zoom & Drag --- */
+
+  // 1. Clic sur l'image : Zoom In / Zoom Out
+  lightboxImg.addEventListener('click', (e) => {
+      e.stopPropagation(); 
+      // Si on a fait un drag significatif, on ignore le clic (pour ne pas dézoomer à la fin du drag)
+      if (hasMoved) { 
+          hasMoved = false; 
+          return; 
+      }
+
+      if (lightboxImg.classList.contains('zoomed')) {
+          // Dezoom
+          resetZoomState();
+      } else {
+          // Zoom
+          lightboxImg.classList.add('zoomed');
+          // CORRECTION: On applique le scale(2) en CONSERVANT la translation (qui est 0,0 au premier zoom).
+          lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(2)`;
+      }
+  });
+
+  // 2. Début du drag
+  lightboxImg.addEventListener('mousedown', (e) => {
+      if (!lightboxImg.classList.contains('zoomed')) return; // Drag seulement si zoomé
+      
+      e.preventDefault(); 
+      isDragging = true;
+      hasMoved = false;
+      
+      // On calcule le point de départ en tenant compte du décalage actuel
+      startX = e.clientX - translateX;
+      startY = e.clientY - translateY;
+      
+      lightboxImg.classList.add('grabbing');
+  });
+
+  // 3. Mouvement du drag
+  window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      
+      e.preventDefault();
+      hasMoved = true; // On a bougé
+
+      translateX = e.clientX - startX;
+      translateY = e.clientY - startY;
+
+      // On applique la transformation. Scale(2) est fixe, translate change.
+      lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(2)`;
+  });
+
+  // 4. Fin du drag
+  window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      lightboxImg.classList.remove('grabbing');
+      // hasMoved reste à true si mouvement, et sera réinitialisé au prochain clic sur l'image
+  });
+
+  // Clavier
   document.addEventListener('keydown', ev => {
-    if(ev.key === 'Escape' && lightbox.classList.contains('show')){
-      closeLightbox();
+    if(lightbox.classList.contains('show')){
+      if(ev.key === 'Escape'){
+        closeLightbox({});
+      } else if (ev.key === 'ArrowLeft') {
+        updateLightbox(currentIndex - 1);
+      } else if (ev.key === 'ArrowRight') {
+        updateLightbox(currentIndex + 1);
+      }
     }
   });
 
@@ -429,5 +647,4 @@ main footer {
 </script>
 
 </body>
-
 </html>
