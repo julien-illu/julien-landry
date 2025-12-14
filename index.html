@@ -215,25 +215,24 @@ main footer {
   transform: scale(0.95);
   transition: opacity 0.3s ease, transform 0.3s ease; 
   cursor: zoom-in;
-  /* Important pour éviter que l'image ne glisse bizarrement */
+  /* Important for mobile: disable default browser zoom/scroll while touching the image */
   user-select: none; 
   -webkit-user-drag: none;
-  /* Ajout pour empêcher le zoom natif sur mobile pendant le défilement */
   touch-action: none;
 }
 
 .lightbox.show img { opacity: 1; transform: scale(1); }
 
-/* État Zoomé */
+/* Zoomed State */
 .lightbox img.zoomed {
-  cursor: grab; /* Curseur main ouverte */
+  cursor: grab; 
   z-index: 2020;
 }
 
-/* État en déplacement */
+/* Dragging State */
 .lightbox img.zoomed.grabbing {
-  cursor: grabbing; /* Curseur main fermée */
-  transition: none; /* Désactive la transition pour un mouvement fluide */
+  cursor: grabbing; 
+  transition: none; 
 }
 
 .lightbox-caption {
@@ -502,12 +501,29 @@ main footer {
 
   /* --- Lightbox Logic --- */
   
-  // Variables pour le Drag & Drop (communes à la souris et au tactile)
+  // State variables (shared between mouse and touch)
   let isDragging = false;
-  let startX = 0, startY = 0;
+  let isPinching = false;
   let translateX = 0, translateY = 0;
+  let currentScale = 1.0;
+  const MIN_SCALE = 1.0;
+  const MAX_SCALE = 4.0; 
+
+  // Mouse/Touch start positions
+  let startX = 0, startY = 0;
+  
+  // Pinch variables
+  let initialPinchDistance = 0;
+  let startScale = 1.0;
   let hasMoved = false; 
 
+  // Helper to calculate distance between two touch points
+  function getDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+  }
+  
   function updateLightbox(index) {
     if (index >= 0 && index < links.length) {
       currentIndex = index;
@@ -538,32 +554,48 @@ main footer {
       lightboxImg.style.transform = '';
       translateX = 0;
       translateY = 0;
+      currentScale = 1.0;
   }
   
-  // Fonction pour appliquer le déplacement et le zoom
   function applyTransform() {
-      lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(2)`;
+      // 1. Clamp scale
+      currentScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, currentScale));
+
+      // 2. Center the image if it's too small to drag
+      if (currentScale <= MIN_SCALE) {
+          resetZoomState(); // Fully reset if back to 1.0 or less
+          return;
+      }
+      
+      // 3. Ensure bounds if image is zoomed
+      if (currentScale > MIN_SCALE) {
+           // We'll skip complex boundary checks for simplification, but ensure 'zoomed' class is on
+           if (!lightboxImg.classList.contains('zoomed')) {
+               lightboxImg.classList.add('zoomed');
+           }
+      }
+
+      // 4. Apply the transform
+      lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
   }
   
-  // Fonction pour gérer le zoom/dézoom
   function toggleZoom(e) {
       e.stopPropagation(); 
-      if (hasMoved) { 
+      if (hasMoved || isPinching) { 
           hasMoved = false; 
           return; 
       }
 
-      if (lightboxImg.classList.contains('zoomed')) {
+      if (currentScale > MIN_SCALE) {
           resetZoomState();
       } else {
-          lightboxImg.classList.add('zoomed');
+          // Default zoom to 2x
+          currentScale = 2.0;
           applyTransform(); 
       }
   }
   
-  // --- OUVERTURE / NAVIGATION / FERMETURE (inchangé) ---
-
-  // Ouverture
+  // --- OPEN / NAV / CLOSE ---
   galleryEl.addEventListener('click', e => {
     e.preventDefault(); 
     const linkClicked = e.target.closest('a.masonry-item');
@@ -572,13 +604,19 @@ main footer {
     updateLightbox(index);
   });
   
-  // Navigation Flèches
   prevBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex - 1); });
   nextBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex + 1); });
   
-  // Fermeture
   function closeLightbox(e){
+    // Check if the target is the image or caption itself (prevents closing on click-to-zoom)
     if (e && (e.target === lightboxImg || e.target === captionEl)) return;
+    
+    // Check if a move happened on the touch event
+    if (e && e.type === 'click' && lightboxImg._wasDragged) {
+         lightboxImg._wasDragged = false;
+         return; 
+    }
+    
     lightbox.classList.remove('show');
     
     setTimeout(() => {
@@ -591,16 +629,16 @@ main footer {
   }
 
   lightbox.addEventListener('click', closeLightbox); 
-  closeBtn.addEventListener('click', closeLightbox); 
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeLightbox({}); }); 
 
-  /* --- Gestion du Zoom & Drag (Souris) --- */
+  /* --- MOUSE HANDLERS (PC) --- */
 
-  // 1. Clic sur l'image : Zoom In / Zoom Out
+  // 1. Zoom In / Zoom Out (PC)
   lightboxImg.addEventListener('click', toggleZoom);
 
-  // 2. Début du drag (Souris)
+  // 2. Start Drag (PC)
   lightboxImg.addEventListener('mousedown', (e) => {
-      if (!lightboxImg.classList.contains('zoomed')) return;
+      if (currentScale <= MIN_SCALE) return;
       
       e.preventDefault(); 
       isDragging = true;
@@ -612,12 +650,14 @@ main footer {
       lightboxImg.classList.add('grabbing');
   });
 
-  // 3. Mouvement du drag (Souris)
+  // 3. Dragging (PC)
   window.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
       
       e.preventDefault();
       hasMoved = true; 
+      // Mark as dragged to avoid click-to-zoom/close at mouseup
+      lightboxImg._wasDragged = true;
 
       translateX = e.clientX - startX;
       translateY = e.clientY - startY;
@@ -625,67 +665,88 @@ main footer {
       applyTransform();
   });
 
-  // 4. Fin du drag (Souris)
+  // 4. End Drag (PC)
   window.addEventListener('mouseup', () => {
       if (!isDragging) return;
       isDragging = false;
       lightboxImg.classList.remove('grabbing');
+      // hasMoved is reset in toggleZoom() or touchEnd
   });
   
-  /* --- Gestion du Zoom & Drag (Tactile) --- */
+  /* --- TOUCH HANDLERS (Mobile) --- */
   
-  // 1. Début du touch
+  // 1. Start Touch
   lightboxImg.addEventListener('touchstart', (e) => {
-      // On ignore si ce n'est pas un seul doigt (pour autoriser le zoom par pincement natif si on le voulait, ici on utilise 1 doigt pour le drag)
-      if (e.touches.length !== 1) return;
-      
-      e.preventDefault(); // Empêche le défilement et le zoom natif
-      
-      // On simule le "mousedown" si on est zoomé
-      if (lightboxImg.classList.contains('zoomed')) {
-          isDragging = true;
+      e.preventDefault(); 
+
+      if (e.touches.length === 1) {
+          // --- SINGLE FINGER (DRAG / TAP) ---
+          isPinching = false;
+          hasMoved = false;
+          lightboxImg._startTapTime = new Date().getTime(); // For tap detection
+
+          if (currentScale > MIN_SCALE) {
+              isDragging = true;
+              startX = e.touches[0].clientX - translateX;
+              startY = e.touches[0].clientY - translateY;
+              lightboxImg.classList.add('grabbing');
+          }
+
+      } else if (e.touches.length === 2) {
+          // --- TWO FINGERS (PINCH) ---
+          isDragging = false;
+          isPinching = true;
           hasMoved = false;
           
-          startX = e.touches[0].clientX - translateX;
-          startY = e.touches[0].clientY - translateY;
-          
-          lightboxImg.classList.add('grabbing');
+          initialPinchDistance = getDistance(e.touches);
+          startScale = currentScale;
+          lightboxImg.classList.add('zoomed'); 
       }
-      
-      // On stocke le temps pour gérer le double-tap/tap simple
-      lightboxImg._lastTouch = new Date().getTime();
   });
 
-  // 2. Mouvement du touch
+  // 2. Move Touch
   lightboxImg.addEventListener('touchmove', (e) => {
-      if (!isDragging || e.touches.length !== 1) return;
-      
       e.preventDefault();
+      
+      // If movement is detected, it's not a tap
       hasMoved = true; 
 
-      translateX = e.touches[0].clientX - startX;
-      translateY = e.touches[0].clientY - startY;
-
-      applyTransform();
+      if (isDragging && e.touches.length === 1) {
+          // Single-finger drag
+          translateX = e.touches[0].clientX - startX;
+          translateY = e.touches[0].clientY - startY;
+          applyTransform();
+          
+      } else if (isPinching && e.touches.length === 2) {
+          // Two-finger pinch
+          const newDistance = getDistance(e.touches);
+          const scaleRatio = newDistance / initialPinchDistance;
+          
+          currentScale = startScale * scaleRatio;
+          
+          // Apply transformation
+          applyTransform();
+      }
   });
 
-  // 3. Fin du touch
+  // 3. End Touch
   lightboxImg.addEventListener('touchend', (e) => {
       if (isDragging) {
           isDragging = false;
           lightboxImg.classList.remove('grabbing');
       }
+      isPinching = false;
       
-      // Gestion du simple tap (zoom/dézoom)
+      // Tap detection (single finger, quick, no significant move)
       const touchTime = new Date().getTime();
-      const timeDiff = touchTime - (lightboxImg._lastTouch || 0);
+      const timeDiff = touchTime - (lightboxImg._startTapTime || 0);
 
-      // Si c'est un tap simple (rapide et pas de mouvement significatif)
-      // J'utilise < 250ms pour un tap. Si on a bougé (hasMoved), c'est un drag, pas un tap.
-      if (timeDiff < 250 && !hasMoved) {
+      if (timeDiff < 250 && !hasMoved && e.touches.length === 0) {
+          // It was a tap (not a move, and all fingers lifted)
           toggleZoom(e);
       }
-      // On réinitialise hasMoved pour le prochain événement
+      
+      // Reset move flag for next event
       hasMoved = false; 
   });
 
