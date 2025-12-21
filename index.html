@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" type="image/png" href="images/caca.webp">
-<title>Julien Landry – Dessin & Peinture</title>
+<title>Julien Landry - Dessin et Peinture</title>
 <meta name="description" content="Portfolio de Julien Landry, artiste peintre et animateur. Découvrez mes dessins, peintures à l'acrylique, pastel et projets d'animation 2D.">
 <link rel="preload" href="riccione-serial-xlight.ttf" as="font" type="font/ttf" crossorigin>
 <style>
@@ -122,8 +122,36 @@ main h1 {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* --- About & Contact --- */
-#aboutContent, #contactContent {
+/* --- Animations Section --- */
+.video-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+.video-item { width: 100%; text-align: center; }
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+}
+
+.video-caption { margin-top: 15px; font-size: 1.1rem; font-style: italic; color: #444; }
+
+/* --- Sections Visibility --- */
+#aboutContent, #contactContent, #animationContent {
   display: none;
   font-size: 1.1rem;
   line-height: 1.7;
@@ -131,7 +159,7 @@ main h1 {
   width: 100%;
 }
 
-#aboutContent h2, #contactContent h2 {
+#aboutContent h2, #contactContent h2, #animationContent h2 {
   font-size: 2em;
   margin-bottom: 50px;
   text-align: center;
@@ -217,7 +245,6 @@ main footer {
   transform: scale(0.95);
   transition: opacity 0.3s ease, transform 0.3s ease; 
   cursor: zoom-in;
-  /* Important for mobile: disable default browser zoom/scroll while touching the image */
   user-select: none; 
   -webkit-user-drag: none;
   touch-action: none;
@@ -225,17 +252,8 @@ main footer {
 
 .lightbox.show img { opacity: 1; transform: scale(1); }
 
-/* Zoomed State */
-.lightbox img.zoomed {
-  cursor: grab; 
-  z-index: 2020;
-}
-
-/* Dragging State */
-.lightbox img.zoomed.grabbing {
-  cursor: grabbing; 
-  transition: none; 
-}
+.lightbox img.zoomed { cursor: grab; z-index: 2020; }
+.lightbox img.zoomed.grabbing { cursor: grabbing; transition: none; }
 
 .lightbox-caption {
   color: #fff;
@@ -306,6 +324,7 @@ main footer {
 <header>
   <a class="homeBtn" href="#home">HOME</a>
   <div class="navLinks">
+    <a class="navLink" href="#animation">Animation</a>
     <a class="navLink" href="#about">About</a>
     <a class="navLink" href="#contact">Contact</a>
     <a class="navLink" href="https://www.instagram.com/julienprimante/" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -425,6 +444,19 @@ main footer {
     </a>
   </div>
 
+  <div id="animationContent">
+    <a name="animation"></a>
+    <h2>Animations</h2>
+    <div class="video-grid">
+        <div class="video-item">
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/NeiRsp03bmY" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <p class="video-caption">Projet d'Animation 2D - LISAA 2025</p>
+        </div>
+    </div>
+  </div>
+
   <div id="aboutContent">
     <a name="about"></a>
     <h2>À propos</h2>
@@ -454,7 +486,6 @@ main footer {
 
 <div class="lightbox" id="lightbox">
   <div class="lightbox-close" id="closeBtn">&times;</div>
-  
   <div class="lightbox-content">
       <div class="lightbox-nav" id="prevBtn">&lt;</div>
       <img src="" alt="Agrandissement">
@@ -478,6 +509,7 @@ main footer {
 
   const aboutContent = document.getElementById('aboutContent');
   const contactContent = document.getElementById('contactContent');
+  const animationContent = document.getElementById('animationContent');
 
   /* --- Navigation & Hash --- */
   function showSection(hash) {
@@ -485,11 +517,14 @@ main footer {
     galleryEl.style.display = 'none';
     aboutContent.style.display = 'none';
     contactContent.style.display = 'none';
+    animationContent.style.display = 'none';
 
     if (id === 'about') {
         aboutContent.style.display = 'block';
     } else if (id === 'contact') {
         contactContent.style.display = 'block';
+    } else if (id === 'animation') {
+        animationContent.style.display = 'block';
     } else {
         galleryEl.style.display = 'block';
     }
@@ -511,8 +546,6 @@ main footer {
   window.addEventListener('DOMContentLoaded', () => showSection(window.location.hash));
 
   /* --- Lightbox Logic --- */
-  
-  // State variables (shared between mouse and touch)
   let isDragging = false;
   let isPinching = false;
   let translateX = 0, translateY = 0;
@@ -520,15 +553,11 @@ main footer {
   const MIN_SCALE = 1.0;
   const MAX_SCALE = 4.0; 
 
-  // Mouse/Touch start positions
   let startX = 0, startY = 0;
-  
-  // Pinch variables
   let initialPinchDistance = 0;
   let startScale = 1.0;
   let hasMoved = false; 
 
-  // Helper to calculate distance between two touch points
   function getDistance(touches) {
       const dx = touches[0].clientX - touches[1].clientX;
       const dy = touches[0].clientY - touches[1].clientY;
@@ -563,50 +592,25 @@ main footer {
   function resetZoomState() {
       lightboxImg.classList.remove('zoomed', 'grabbing');
       lightboxImg.style.transform = '';
-      translateX = 0;
-      translateY = 0;
-      currentScale = 1.0;
+      translateX = 0; translateY = 0; currentScale = 1.0;
   }
   
   function applyTransform() {
-      // 1. Clamp scale
       currentScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, currentScale));
-
-      // 2. Center the image if it's too small to drag
-      if (currentScale <= MIN_SCALE) {
-          resetZoomState(); // Fully reset if back to 1.0 or less
-          return;
+      if (currentScale <= MIN_SCALE) { resetZoomState(); return; }
+      if (currentScale > MIN_SCALE && !lightboxImg.classList.contains('zoomed')) {
+          lightboxImg.classList.add('zoomed');
       }
-      
-      // 3. Ensure bounds if image is zoomed
-      if (currentScale > MIN_SCALE) {
-           // We'll skip complex boundary checks for simplification, but ensure 'zoomed' class is on
-           if (!lightboxImg.classList.contains('zoomed')) {
-               lightboxImg.classList.add('zoomed');
-           }
-      }
-
-      // 4. Apply the transform
       lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
   }
   
   function toggleZoom(e) {
       e.stopPropagation(); 
-      if (hasMoved || isPinching) { 
-          hasMoved = false; 
-          return; 
-      }
-
-      if (currentScale > MIN_SCALE) {
-          resetZoomState();
-      } else {
-          // Default zoom to 2x
-          currentScale = 2.0;
-          applyTransform(); 
-      }
+      if (hasMoved || isPinching) { hasMoved = false; return; }
+      if (currentScale > MIN_SCALE) { resetZoomState(); } 
+      else { currentScale = 2.0; applyTransform(); }
   }
   
-  // --- OPEN / NAV / CLOSE ---
   galleryEl.addEventListener('click', e => {
     e.preventDefault(); 
     const linkClicked = e.target.closest('a.masonry-item');
@@ -619,17 +623,12 @@ main footer {
   nextBtn.addEventListener('click', (e) => { e.stopPropagation(); updateLightbox(currentIndex + 1); });
   
   function closeLightbox(e){
-    // Check if the target is the image or caption itself (prevents closing on click-to-zoom)
     if (e && (e.target === lightboxImg || e.target === captionEl)) return;
-    
-    // Check if a move happened on the touch event
     if (e && e.type === 'click' && lightboxImg._wasDragged) {
          lightboxImg._wasDragged = false;
          return; 
     }
-    
     lightbox.classList.remove('show');
-    
     setTimeout(() => {
       lightbox.style.display = 'none';
       lightboxImg.src = '';
@@ -642,145 +641,77 @@ main footer {
   lightbox.addEventListener('click', closeLightbox); 
   closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeLightbox({}); }); 
 
-  /* --- MOUSE HANDLERS (PC) --- */
-
-  // 1. Zoom In / Zoom Out (PC)
+  /* --- PC HANDLERS --- */
   lightboxImg.addEventListener('click', toggleZoom);
-
-  // 2. Start Drag (PC)
   lightboxImg.addEventListener('mousedown', (e) => {
       if (currentScale <= MIN_SCALE) return;
-      
-      e.preventDefault(); 
-      isDragging = true;
-      hasMoved = false;
-      
-      startX = e.clientX - translateX;
-      startY = e.clientY - translateY;
-      
+      e.preventDefault(); isDragging = true; hasMoved = false;
+      startX = e.clientX - translateX; startY = e.clientY - translateY;
       lightboxImg.classList.add('grabbing');
   });
-
-  // 3. Dragging (PC)
   window.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
-      
-      e.preventDefault();
-      hasMoved = true; 
-      // Mark as dragged to avoid click-to-zoom/close at mouseup
-      lightboxImg._wasDragged = true;
-
-      translateX = e.clientX - startX;
-      translateY = e.clientY - startY;
-
+      e.preventDefault(); hasMoved = true; lightboxImg._wasDragged = true;
+      translateX = e.clientX - startX; translateY = e.clientY - startY;
       applyTransform();
   });
-
-  // 4. End Drag (PC)
   window.addEventListener('mouseup', () => {
       if (!isDragging) return;
-      isDragging = false;
-      lightboxImg.classList.remove('grabbing');
-      // hasMoved is reset in toggleZoom() or touchEnd
+      isDragging = false; lightboxImg.classList.remove('grabbing');
   });
   
-  /* --- TOUCH HANDLERS (Mobile) --- */
-  
-  // 1. Start Touch
+  /* --- TOUCH HANDLERS --- */
   lightboxImg.addEventListener('touchstart', (e) => {
       e.preventDefault(); 
-
       if (e.touches.length === 1) {
-          // --- SINGLE FINGER (DRAG / TAP) ---
-          isPinching = false;
-          hasMoved = false;
-          lightboxImg._startTapTime = new Date().getTime(); // For tap detection
-
+          isPinching = false; hasMoved = false;
+          lightboxImg._startTapTime = new Date().getTime();
           if (currentScale > MIN_SCALE) {
               isDragging = true;
               startX = e.touches[0].clientX - translateX;
               startY = e.touches[0].clientY - translateY;
               lightboxImg.classList.add('grabbing');
           }
-
       } else if (e.touches.length === 2) {
-          // --- TWO FINGERS (PINCH) ---
-          isDragging = false;
-          isPinching = true;
-          hasMoved = false;
-          
+          isDragging = false; isPinching = true; hasMoved = false;
           initialPinchDistance = getDistance(e.touches);
           startScale = currentScale;
           lightboxImg.classList.add('zoomed'); 
       }
   });
 
-  // 2. Move Touch
   lightboxImg.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      
-      // If movement is detected, it's not a tap
-      hasMoved = true; 
-
+      e.preventDefault(); hasMoved = true; 
       if (isDragging && e.touches.length === 1) {
-          // Single-finger drag
           translateX = e.touches[0].clientX - startX;
           translateY = e.touches[0].clientY - startY;
           applyTransform();
-          
       } else if (isPinching && e.touches.length === 2) {
-          // Two-finger pinch
           const newDistance = getDistance(e.touches);
-          const scaleRatio = newDistance / initialPinchDistance;
-          
-          currentScale = startScale * scaleRatio;
-          
-          // Apply transformation
+          currentScale = startScale * (newDistance / initialPinchDistance);
           applyTransform();
       }
   });
 
-  // 3. End Touch
   lightboxImg.addEventListener('touchend', (e) => {
-      if (isDragging) {
-          isDragging = false;
-          lightboxImg.classList.remove('grabbing');
-      }
+      if (isDragging) { isDragging = false; lightboxImg.classList.remove('grabbing'); }
       isPinching = false;
-      
-      // Tap detection (single finger, quick, no significant move)
       const touchTime = new Date().getTime();
-      const timeDiff = touchTime - (lightboxImg._startTapTime || 0);
-
-      if (timeDiff < 250 && !hasMoved && e.touches.length === 0) {
-          // It was a tap (not a move, and all fingers lifted)
+      if ((touchTime - (lightboxImg._startTapTime || 0)) < 250 && !hasMoved && e.touches.length === 0) {
           toggleZoom(e);
       }
-      
-      // Reset move flag for next event
       hasMoved = false; 
   });
 
-
-  // Clavier
   document.addEventListener('keydown', ev => {
     if(lightbox.classList.contains('show')){
-      if(ev.key === 'Escape'){
-        closeLightbox({});
-      } else if (ev.key === 'ArrowLeft') {
-        updateLightbox(currentIndex - 1);
-      } else if (ev.key === 'ArrowRight') {
-        updateLightbox(currentIndex + 1);
-      }
+      if(ev.key === 'Escape') closeLightbox({});
+      else if (ev.key === 'ArrowLeft') updateLightbox(currentIndex - 1);
+      else if (ev.key === 'ArrowRight') updateLightbox(currentIndex + 1);
     }
   });
-
 })();
 </script>
 
 </body>
-
 </html>
-
-
-
