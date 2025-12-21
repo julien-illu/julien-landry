@@ -146,6 +146,7 @@ main h1 {
 .video-wrapper iframe {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
+    border: 0;
 }
 
 .video-caption { margin-top: 15px; font-size: 1.1rem; font-style: italic; color: #444; }
@@ -450,10 +451,10 @@ main footer {
     <div class="video-grid">
         <div class="video-item">
             <div class="video-wrapper">
-                <video controls poster="images/your-thumbnail.jpg" style="width:100%; height:auto; border-radius:8px;">
-                    <source src="https://drive.google.com/uc?export=download&id=1cA4m7J0Nf9YIUn1fuuFWcLkpb2LhvH7n" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
+                <iframe 
+                    src="https://drive.google.com/file/d/1cA4m7J0Nf9YIUn1fuuFWcLkpb2LhvH7n/preview" 
+                    allow="autoplay">
+                </iframe>
             </div>
             <p class="video-caption">Projet d'Animation 2D - LISAA 2025</p>
         </div>
